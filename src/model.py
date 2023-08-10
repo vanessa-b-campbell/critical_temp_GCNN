@@ -4,21 +4,21 @@ import torch.nn.functional as F
 from torch_geometric.nn import  GATConv, NNConv
 from torch_geometric.nn import aggr
 
-class GCN_Geo(torch.nn.Module):
+class GCN_Temp(torch.nn.Module):
     def __init__(self, initial_dim_gcn, edge_dim_feature,
-                 hidden_dim_nn_1=2000,
-                 p1 = 0.5,
-                 hidden_dim_nn_2=500,
-                 p2 = 0.4 ,
-                 hidden_dim_nn_3=100,
-                 p3 = 0.3 ,
+                hidden_dim_nn_1=2000,
+                p1 = 0.5,
+                hidden_dim_nn_2=500,
+                p2 = 0.4 ,
+                hidden_dim_nn_3=100,
+                p3 = 0.3 ,
                 
-                 
-                 hidden_dim_fcn_1=1000,
-                 hidden_dim_fcn_2=100,
-                 hidden_dim_fcn_3=50,
-                 ):
-        super(GCN_Geo, self).__init__()
+                
+                hidden_dim_fcn_1=1000,
+                hidden_dim_fcn_2=100,
+                hidden_dim_fcn_3=50,
+                ):
+        super(GCN_Temp, self).__init__()
 
         self.nn_conv_1 = NNConv(initial_dim_gcn, hidden_dim_nn_1,
                                 nn=torch.nn.Sequential(torch.nn.Linear(edge_dim_feature, initial_dim_gcn * hidden_dim_nn_1)), 

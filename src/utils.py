@@ -18,8 +18,8 @@ def smiles2geodata(smile, y, node_features_dict, edge_features_dict):
     hybridization = [atom.GetHybridization().real for atom in molecule.GetAtoms()]
     
     node_keys_features = [f"{atomic}_{aromatic}_{bonds}_{hydrogen}_{hybrid}" 
-                          for atomic, aromatic, bonds, hydrogen, hybrid 
-                          in zip(atomic_number, aromaticity, num_bonds, bonded_hydrogens, hybridization)]
+                        for atomic, aromatic, bonds, hydrogen, hybrid 
+                        in zip(atomic_number, aromaticity, num_bonds, bonded_hydrogens, hybridization)]
     
     edge_key_features = []
     for bond in molecule.GetBonds():
@@ -147,20 +147,19 @@ def get_edge_indices(molecule):
 
 
 
-''' lista_smile = ['Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14', 
-               'COc1cc(OC)c(cc1NC(=O)CSCC(=O)O)S(=O)(=O)N2C(C)CCc3ccccc23', 
-               'CS(=O)(=O)c1ccccc1C(=O)NC[C@@H](O)CN2CCC(CC2)Oc3ccc(Cl)c(Cl)c3', 
-               'CC(C)N(CCC(C(=O)N)(c1ccccc1)c2ccccn2)C(C)C',
-               'Cc1cc(CCC2CCN(CC2)S(=O)(=O)CC3(CCOCC3)N(O)C=O)c(C)cn1'
-               ]
+# lista_smile = ['Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14', 
+#             'COc1cc(OC)c(cc1NC(=O)CSCC(=O)O)S(=O)(=O)N2C(C)CCc3ccccc23', 
+#             'CS(=O)(=O)c1ccccc1C(=O)NC[C@@H](O)CN2CCC(CC2)Oc3ccc(Cl)c(Cl)c3', 
+#             'CC(C)N(CCC(C(=O)N)(c1ccccc1)c2ccccn2)C(C)C',
+#             'Cc1cc(CCC2CCN(CC2)S(=O)(=O)CC3(CCOCC3)N(O)C=O)c(C)cn1'
+#             ]
 
- '''
- 
-''' features = get_atom_features(lista_smile)
 
-print(features) 
-num_keys = len(features)
-print("Número de claves en el diccionario:", num_keys)
-value_dims = [len(value) for value in features.values()]
-print("Dimensiones de los valores del diccionario:", value_dims)
- '''
+
+# features = get_atom_features(lista_smile)
+
+# print(features) 
+# num_keys = len(features)
+# print("Number of keys in the dictionary:", num_keys)
+# value_dims = [len(value) for value in features.values()]
+# print("Dimensions of dictionary values:", value_dims)

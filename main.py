@@ -8,8 +8,8 @@ import torch.optim as optim
 from torch_geometric.loader import DataLoader
 
 from src.device import device_info
-from src.data import GeoDataset
-from src.model import GCN_Geo 
+from src.data import TempDataset
+from src.model import GCN_Temp 
 from src.process import train, validation, predict
 
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
@@ -25,7 +25,7 @@ start_time = time.time()
 ## SET UP DATALOADERS: ---
 
 # Build starting dataset: 
-dataset = GeoDataset(root='data')
+dataset = TempDataset('C:\\Users\\color\\Documents\\Bilodeau_Research_Python\\Critical_Temp_Research\\critical_temp_GCNN\\csv_data\\No_outliers_smile_dataset.csv')
 print('Number of NODES features: ', dataset.num_features)
 print('Number of EDGES features: ', dataset.num_edge_features)
 
@@ -55,9 +55,9 @@ val_dataloader = DataLoader(val_set, batch_size, shuffle=True)
 torch.manual_seed(0)
 
 # Set up model:
-model =  GCN_Geo(initial_dim_gcn = dataset.num_features
+model =  GCN_Temp(initial_dim_gcn = dataset.num_features
                 , edge_dim_feature = dataset.num_edge_features
-                 ).to(device)
+                ).to(device)
 
 # Set up optimizer:
 learning_rate = 1e-3

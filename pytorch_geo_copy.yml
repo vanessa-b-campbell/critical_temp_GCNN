@@ -242,7 +242,6 @@ dependencies:
   - zipp=3.11.0=py37hecd8cb5_0
   - zlib=1.2.13=h4dc903c_0
   - zstd=1.5.5=hc035e20_0
-  
   - pip:
     - joblib==1.2.0
     - markupsafe==2.1.3

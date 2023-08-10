@@ -29,7 +29,7 @@ def train(model, device, dataloader, optim, epoch):
         loss_collect += loss.item()  # loss summed across the batch
         
         # Print out our Training loss so we know how things are going
- 
+
 
     # Return our normalized losses so we can analyze them later:
     loss_collect /= len(dataloader.dataset)
@@ -98,5 +98,5 @@ def predict(model, dataloader, device):
     X_all = torch.concat(X_all)
     y_all = torch.concat(y_all)
     pred_all = torch.concat(pred_all)
-               
+
     return X_all, y_all, pred_all

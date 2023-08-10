@@ -6,14 +6,14 @@ from torch_geometric.data import InMemoryDataset
 
 from src.utils import smiles2geodata, get_atom_features
 
-class GeoDataset(InMemoryDataset):
-    def __init__(self, root='../data',raw_name='lipo_clean.csv',processed_name='lipo_processed.pt',transform=None, pre_transform=None):
+class TempDataset(InMemoryDataset):
+    def __init__(self, path, root='../csv_data',raw_name='clean_smile_dataset.csv',transform=None, pre_transform=None):
         
         self.filename = os.path.join(root,raw_name)
         #self.processed_filename = os.path.join(root,processed_name)
         
         # read a csv from that path:
-        self.df = pd.read_csv(self.filename)
+        self.df = pd.read_csv(path)
         
         # assign dataset attribute "input_vectors" to be the 2048 bit vector representing each molecule:
         self.x = self.df[self.df.columns[0]].values
@@ -22,7 +22,7 @@ class GeoDataset(InMemoryDataset):
         self.y = self.df[self.df.columns[-1]].values   
         
         
-        super(GeoDataset, self).__init__(root, transform, pre_transform)
+        super(TempDataset, self).__init__(root, transform, pre_transform)
         
         self.data, self.slices = torch.load(self.processed_paths[0])
         
