@@ -42,7 +42,7 @@ train_set, val_set = torch.utils.data.random_split(
 )
 
 # # Build pytorch training and validation set dataloaders:
-batch_size = 20
+batch_size = 10
 dataloader = DataLoader(dataset, batch_size, shuffle=True)
 
 
@@ -67,7 +67,7 @@ train_losses = []
 val_losses = []
 
 Sstart_time = time.time()
-for epoch in range(1, 300): #TODO
+for epoch in range(1, 100): #TODO
 
     train_loss = train(model, device, train_dataloader, optimizer, epoch)
     train_losses.append(train_loss)
