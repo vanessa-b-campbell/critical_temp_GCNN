@@ -69,7 +69,7 @@ train_losses = []
 val_losses = []
 
 Sstart_time = time.time()
-for epoch in range(1, 100): #TODO
+for epoch in range(1, 200): #TODO
 
     train_loss = train(model, device, train_dataloader, optimizer, epoch)
     train_losses.append(train_loss)
