@@ -24,8 +24,10 @@ start_time = time.time()
 
 ## SET UP DATALOADERS: ---
 
+
 # Build starting dataset: 
-dataset = TempDataset('C:\\Users\\color\\Documents\\Bilodeau_Research_Python\\Critical_Temp_Research\\critical_temp_GCNN\\csv_data\\No_outliers_smile_dataset.csv')
+# dataset = TempDataset('C:\\Users\\color\\Documents\\Bilodeau_Research_Python\\Critical_Temp_Research\\critical_temp_GCNN\\csv_data\\No_outliers_smile_dataset.csv')
+dataset = TempDataset('/home/jbd3qn/Downloads/critical_temp_GCNN/csv_data/No_outliers_smile_dataset.csv')
 print('Number of NODES features: ', dataset.num_features)
 print('Number of EDGES features: ', dataset.num_edge_features)
 
@@ -67,7 +69,7 @@ train_losses = []
 val_losses = []
 
 Sstart_time = time.time()
-for epoch in range(1, 100): #TODO
+for epoch in range(1, 200): #TODO
 
     train_loss = train(model, device, train_dataloader, optimizer, epoch)
     train_losses.append(train_loss)
