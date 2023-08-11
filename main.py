@@ -68,6 +68,8 @@ optimizer = optim.Adam(model.parameters(), learning_rate)
 train_losses = []
 val_losses = []
 
+best_val_loss = float('inf')  # infinito
+
 Sstart_time = time.time()
 for epoch in range(1, 200): #TODO
 
@@ -76,10 +78,16 @@ for epoch in range(1, 200): #TODO
 
     val_loss = validation(model, device, val_dataloader, epoch)
     val_losses.append(val_loss)
+    
+    if val_loss < best_val_loss:
+        best_val_loss = val_loss
+        
+        torch.save(model.state_dict(), "best_model_weights.pth")
 
 finish_time = time.time()
 time = finish_time -start_time
 print("\n -Training finished: {:3f} seconds".format(time))
+
 
 plt.plot(train_losses, label='Train losses')
 plt.legend()
@@ -92,6 +100,9 @@ plt.xlabel('Time')
 plt.ylabel('Losses')
 plt.show()
 
+#Testing:
+weights_file = "best_model_weights.pth"
+
 # Training:
 input_all, target_all, pred_prob_all = predict(model, train_dataloader, device)
 
@@ -99,6 +110,7 @@ r2 = r2_score(target_all.cpu(), pred_prob_all.cpu())
 mae = mean_absolute_error(target_all.cpu(), pred_prob_all.cpu())
 rmse = mean_squared_error(target_all.cpu(), pred_prob_all.cpu(), squared=False)
 r, _ = pearsonr(target_all.cpu(), pred_prob_all.cpu())
+
 
 legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".format(r2, r , mae, rmse)
 
@@ -115,7 +127,7 @@ plt.show()
 
 # Validation:
 
-input_all, target_all, pred_prob_all = predict(model, val_dataloader, device)
+input_all, target_all, pred_prob_all = predict(model, val_dataloader, device, weights_file)
 
 r2 = r2_score(target_all.cpu(), pred_prob_all.cpu())
 mae = mean_absolute_error(target_all.cpu(), pred_prob_all.cpu())
