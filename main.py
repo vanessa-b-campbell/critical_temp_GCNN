@@ -24,8 +24,10 @@ start_time = time.time()
 
 ## SET UP DATALOADERS: ---
 
+
 # Build starting dataset: 
-dataset = TempDataset('C:\\Users\\color\\Documents\\Bilodeau_Research_Python\\Critical_Temp_Research\\critical_temp_GCNN\\csv_data\\No_outliers_smile_dataset.csv')
+# dataset = TempDataset('C:\\Users\\color\\Documents\\Bilodeau_Research_Python\\Critical_Temp_Research\\critical_temp_GCNN\\csv_data\\No_outliers_smile_dataset.csv')
+dataset = TempDataset('/home/jbd3qn/Downloads/critical_temp_GCNN/csv_data/No_outliers_smile_dataset.csv')
 print('Number of NODES features: ', dataset.num_features)
 print('Number of EDGES features: ', dataset.num_edge_features)
 
