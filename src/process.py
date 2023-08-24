@@ -73,10 +73,11 @@ def validation(model, device, dataloader, epoch):
 
 
 
-def predict(model, dataloader, device):
+def predict(model, dataloader, device, weights_file):
 
     # Set our model to evaluation mode:
     model.eval()
+    model.load_state_dict(torch.load(weights_file))
 
     X_all = []
     y_all = []
