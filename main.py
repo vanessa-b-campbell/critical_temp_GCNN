@@ -90,13 +90,13 @@ for epoch in range(1, num_of_epochs): #TODO
 
 finish_time_training = time.time()
 time_training = finish_time_training -start_time_training
-print("\n -Training finished: {:3f} seconds".format(time))
+
 
 #Testing:
 weights_file = "best_model_weights.pth"
 
 # Training:
-input_all, target_all, pred_prob_all = predict(model, train_dataloader, device)
+input_all, target_all, pred_prob_all = predict(model, train_dataloader, device, weights_file)
 
 
 r2_train = r2_score(target_all.cpu(), pred_prob_all.cpu())
