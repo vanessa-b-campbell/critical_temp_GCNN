@@ -74,7 +74,7 @@ val_losses = []
 best_val_loss = float('inf')  # infinite
 
 start_time_training = time.time()
-num_of_epochs = 200
+num_of_epochs = 100
 for epoch in range(1, num_of_epochs): #TODO
 
     train_loss = train(model, device, train_dataloader, optimizer, epoch)
