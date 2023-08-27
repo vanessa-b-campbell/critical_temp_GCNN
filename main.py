@@ -186,15 +186,15 @@ data = {
         "num_edge_features",
         "initial_dim_gcn ",
         "edge_dim_feature",
-        "hidden_dim_nn_1 ",
-        "p1 ",
-        "hidden_dim_nn_2 ",
-        "p2 ",
-        "hidden_dim_nn_3 ",
-        "p3 ",
-        "hidden_dim_fcn_1 ",
-        "hidden_dim_fcn_2 ",
-        "hidden_dim_fcn_3 ",
+        # "hidden_dim_nn_1 ",
+        # "p1 ",
+        # "hidden_dim_nn_2 ",
+        # "p2 ",
+        # "hidden_dim_nn_3 ",
+        # "p3 ",
+        # "hidden_dim_fcn_1 ",
+        # "hidden_dim_fcn_2 ",
+        # "hidden_dim_fcn_3 ",
         "training_test_percentage %",
         "batch_size", 
         "learning_rate",
@@ -247,6 +247,6 @@ data = {
 }
 
 df = pd.DataFrame(data)
-df.to_csv('results/results.csv', index=False)
+df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/results.csv', index=False)
 
 # %%
