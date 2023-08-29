@@ -30,22 +30,24 @@ print('Number of EDGES features: ', dataset.num_edge_features)
 finish_time_preprocessing = time.time()
 time_preprocessing = (finish_time_preprocessing - finish_time_preprocessing) / 60
 
-# # Number of datapoints in the training set:
-training_test_percentage = 0.8
-n_train = int(len(dataset) * training_test_percentage)
+# # # Number of datapoints in the training set:
+# training_test_percentage = 0.8
+# n_train = int(len(dataset) * training_test_percentage)
 
-# # Number of datapoints in the validation set:
-n_val = len(dataset) - n_train
+# # # Number of datapoints in the validation set:
+# n_val = len(dataset) - n_train
 
-# # Define pytorch training and validation set objects:
-train_set, val_set = torch.utils.data.random_split(
-    dataset, [n_train, n_val], generator=torch.Generator().manual_seed(42) #TODO 
-)
+# # # Define pytorch training and validation set objects:
+# train_set, val_set = torch.utils.data.random_split(
+#     dataset, [n_train, n_val], generator=torch.Generator().manual_seed(42) #TODO 
+# )
 
 # # Build pytorch training and validation set dataloaders:
 batch_size = 10
 dataloader = DataLoader(dataset, batch_size, shuffle=True)
 
+train_set = TempDataset('/home/jbd3qn/Downloads/critical_temp_GCNN/train_full.csv')
+val_set = TempDataset('/home/jbd3qn/Downloads/critical_temp_GCNN/val_full.csv')
 
 train_dataloader = DataLoader(train_set, batch_size, shuffle=True)
 val_dataloader = DataLoader(val_set, batch_size, shuffle=True)
@@ -195,7 +197,8 @@ data = {
         # "hidden_dim_fcn_1 ",
         # "hidden_dim_fcn_2 ",
         # "hidden_dim_fcn_3 ",
-        "training_test_percentage %",
+        "training split ",
+        "validation split ",
         "batch_size", 
         "learning_rate",
         "number_of_epochs",
@@ -226,7 +229,8 @@ data = {
         # hidden_dim_fcn_1 ,
         # hidden_dim_fcn_2 ,
         # hidden_dim_fcn_3 ,
-        training_test_percentage*100,
+        "Chemprop",
+        "Chemprop",
         batch_size,
         learning_rate,
         num_of_epochs,
@@ -249,4 +253,33 @@ data = {
 df = pd.DataFrame(data)
 df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/results.csv', index=False)
 
+# %%
+
+test_set = TempDataset('/home/jbd3qn/Downloads/critical_temp_GCNN/test_full.csv')
+
+test_dataloader = DataLoader(test_set, batch_size, shuffle=True)
+
+input_all, target_all, pred_prob_all = predict(model, test_dataloader, device, weights_file)
+
+
+r2_test = r2_score(target_all.cpu(), pred_prob_all.cpu())
+mae_test = mean_absolute_error(target_all.cpu(), pred_prob_all.cpu())
+rmse_test = mean_squared_error(target_all.cpu(), pred_prob_all.cpu(), squared=False)
+r_test, _ = pearsonr(target_all.cpu(), pred_prob_all.cpu())
+
+#testing stats
+legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".format(
+    r2_test, r_test , mae_test, rmse_test
+)
+
+plt.figure(figsize=(4, 4), dpi=100)
+plt.scatter(target_all.cpu(), pred_prob_all.cpu(), alpha=0.3)
+plt.plot([min(target_all.cpu()), max(target_all.cpu())], [min(target_all.cpu()),
+                                                            max(target_all.cpu())], color="k", ls="--")
+plt.xlim([min(target_all.cpu()), max(target_all.cpu())])
+plt.title('Testing')
+plt.xlabel("True Values")
+plt.ylabel("Predicted Values")
+plt.legend([legend_text], loc="lower right")
+plt.show()
 # %%
