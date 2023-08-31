@@ -21,10 +21,6 @@ start_time = time.time()
 
 ## SET UP DATALOADERS: ---
 
-
-# combined file of the training set and validation set
-# train_val_dataset = TempDataset('/home/jbd3qn/Downloads/critical_temp_GCNN/src/train_val_full.csv')
-
 data = TempDataset('/home/jbd3qn/Downloads/critical_temp_GCNN/csv_data/No_outliers_smile_dataset.csv')
 print('Number of NODES features: ', data.num_features)
 print('Number of EDGES features: ', data.num_edge_features)
@@ -33,21 +29,16 @@ print('Number of EDGES features: ', data.num_edge_features)
 
 finish_time_preprocessing = time.time()
 time_preprocessing = (finish_time_preprocessing - finish_time_preprocessing) / 60
-# Set up model:
-##################################################### 
-# I don't understand inital dimensions line- 
-# do I want the whole dataset to be the intial dimension or 
-# or just the training+val set and not the testing
-#####################################################
 
+
+# Set up model:
 val_set = TempDataset('/home/jbd3qn/Downloads/critical_temp_GCNN/val_full.csv')
 train_set = TempDataset('/home/jbd3qn/Downloads/critical_temp_GCNN/train_full.csv')
 
 
 # Build pytorch training and validation set dataloaders:
 batch_size = 10
-dataloader = DataLoader(data, batch_size, shuffle=True)
-
+dataloader = DataLoader(data, batch_size, shuffle=True) ################################# like 80% sure this line does nothing
 
 
 train_dataloader = DataLoader(train_set, batch_size, shuffle=True)
@@ -60,26 +51,29 @@ val_dataloader = DataLoader(val_set, batch_size, shuffle=True)
 # Train with a random seed to initialize weights:
 torch.manual_seed(0)
 
-# Set up model
-initial_dim_gcn = data.num_features
-edge_dim_feature = data.num_edge_features
+
+## SET UP MODEL
+# note to self- the number of features and the number of edge features is the same whether
+# using whole data for '.num_features' or just a combination of train/val data
+# Ask daniel what these are actually doing- how are these values aquired from the dataset
+initial_dim_gcn = data.num_features         #45
+edge_dim_feature = data.num_edge_features   #11
 
 
 model =  GCN_Temp(initial_dim_gcn, edge_dim_feature).to(device)
+
 
 # Set up optimizer:
 learning_rate = 1e-3
 optimizer = optim.Adam(model.parameters(), learning_rate)
 
 train_losses = []
-
-
 val_losses = []
 
 best_val_loss = float('inf')  # infinite
 
 start_time_training = time.time()
-num_of_epochs = 100
+num_of_epochs = 200
 for epoch in range(1, num_of_epochs): #TODO
 
     train_loss = train(model, device, train_dataloader, optimizer, epoch)
