@@ -10,6 +10,8 @@ import pandas as pd
 from src.process import predict
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 from scipy.stats import pearsonr
+import numpy as np
+from rdkit import Chem
 
 
 # device information
@@ -27,7 +29,7 @@ model =  GCN_Temp(initial_dim_gcn, edge_dim_feature).to(device)
 
 batch_size = 10
 
-weights_file = "best_model_weights.pth"
+weights_file = "best_model_weights_new.pth"
 
 
 ## SET UP testing DATALOADERS: ---
@@ -36,6 +38,12 @@ test_set = TempDataset('/home/jbd3qn/Downloads/critical_temp_GCNN/test_full.csv'
 test_dataloader = DataLoader(test_set, batch_size, shuffle=True)
 
 input_all, target_all, pred_prob_all = predict(model, test_dataloader, device, weights_file)
+
+
+input_all = input_all.cpu()
+target_all = target_all.cpu()
+pred_prob_all = pred_prob_all.cpu()
+
 
 
 r2_test = r2_score(target_all.cpu(), pred_prob_all.cpu())
@@ -58,3 +66,65 @@ plt.xlabel("True Values")
 plt.ylabel("Predicted Values")
 plt.legend([legend_text], loc="lower right")
 plt.show()
+
+
+
+input_all = input_all.numpy()
+target_all = target_all.numpy()
+pred_prob_all = pred_prob_all.numpy()
+
+
+data_smile = {
+    "Metric": [
+        "SMILEs"
+    ],
+    "Value": [
+        input_all,
+    ],
+    
+}
+
+
+data_temp = {
+    "Metric": [
+        "critical_temp",
+    ],
+    "Value": [
+        target_all,
+    ],
+    
+}
+
+data_p_temp = {
+    "Metric": [
+        "predicted temp"
+    ],
+    "Value": [
+        pred_prob_all
+    ],
+    
+}
+
+
+
+smile_input = []
+
+for each in input_all:
+    mol = Chem.MolFromFingerprint(each)
+    if mol is not None:
+        # 2. Generate a SMILES string
+        smiles = Chem.MolToSmiles(mol)
+        smile_input.append(smiles)
+    else:
+        print("Could not convert the fingerprint to a molecule.")
+
+df1 = pd.DataFrame(smile_input)
+
+df2 = pd.DataFrame(target_all)
+df3 = pd.DataFrame(pred_prob_all)
+
+combined_df = pd.concat([df1, df2, df3], ignore_index=True, axis=1)
+combined_df.columns = ['SMILEs', 'critical_temp', 'predicted_temp']
+# ok need to make them into comlumns also to make the fingerprint back into SMILEs 
+# is that possible? 
+combined_df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp.csv', index=False)
