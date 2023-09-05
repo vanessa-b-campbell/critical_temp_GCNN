@@ -1,0 +1,22 @@
+Metric,Value
+number_features,45
+num_edge_features,11
+initial_dim_gcn ,45
+edge_dim_feature,11
+training split ,Chemprop
+validation split ,Chemprop
+batch_size,10
+learning_rate,0.001
+number_of_epochs,100
+r2_train,0.9653882291537667
+r_train,0.9830141238004011
+mae_train,18.50515991993
+rmse_train,26.521024935057195
+r2_validation,0.965388229106106
+r_validation,0.9830141239925253
+mae_validation,18.505159364516036
+rmse_validation,26.521024953317006
+time_preprocessing,0.0
+time_training,109.34736132621765
+time_prediction,0.4141232013702393
+total_time,2.2477614005406696

@@ -1,22 +1,22 @@
 Metric,Value
-number_features,45
-num_edge_features,11
-initial_dim_gcn ,45
-edge_dim_feature,11
+number_features,27
+num_edge_features,10
+initial_dim_gcn ,27
+edge_dim_feature,10
 training split ,Chemprop
 validation split ,Chemprop
 batch_size,10
 learning_rate,0.001
 number_of_epochs,100
-r2_train,0.9653882291537667
-r_train,0.9830141238004011
-mae_train,18.50515991993
-rmse_train,26.521024935057195
-r2_validation,0.965388229106106
-r_validation,0.9830141239925253
-mae_validation,18.505159364516036
-rmse_validation,26.521024953317006
+r2_train,0.8366348428360698
+r_train,0.9397420843663336
+mae_train,39.45331322652883
+rmse_train,49.92551777246316
+r2_validation,0.8366348333764659
+r_validation,0.9397420759131268
+mae_validation,39.45331243728112
+rmse_validation,49.92551921792321
 time_preprocessing,0.0
-time_training,109.34736132621765
-time_prediction,0.4141232013702393
-total_time,2.2477614005406696
+time_training,12.181802034378052
+time_prediction,0.16918661197026572
+total_time,0.38296186129252113

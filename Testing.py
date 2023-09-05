@@ -12,6 +12,7 @@ from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 from scipy.stats import pearsonr
 import numpy as np
 from rdkit import Chem
+ 
 
 
 # device information
@@ -33,23 +34,24 @@ weights_file = "best_model_weights_new.pth"
 
 
 ## SET UP testing DATALOADERS: ---
-test_set = TempDataset('/home/jbd3qn/Downloads/critical_temp_GCNN/test_full.csv')
+test_set = TempDataset()
+print(test_set)
 
 test_dataloader = DataLoader(test_set, batch_size, shuffle=True)
 
-input_all, target_all, pred_prob_all = predict(model, test_dataloader, device, weights_file)
+input_all_test, target_all_test, pred_prob_all_test = predict(model, test_dataloader, device, weights_file)
 
 
-input_all = input_all.cpu()
-target_all = target_all.cpu()
-pred_prob_all = pred_prob_all.cpu()
+input_all_test = input_all_test.cpu()
+target_all_test = target_all_test.cpu()
+pred_prob_all_test = pred_prob_all_test.cpu()
 
 
 
-r2_test = r2_score(target_all.cpu(), pred_prob_all.cpu())
-mae_test = mean_absolute_error(target_all.cpu(), pred_prob_all.cpu())
-rmse_test = mean_squared_error(target_all.cpu(), pred_prob_all.cpu(), squared=False)
-r_test, _ = pearsonr(target_all.cpu(), pred_prob_all.cpu())
+r2_test = r2_score(target_all_test.cpu(), pred_prob_all_test.cpu())
+mae_test = mean_absolute_error(target_all_test.cpu(), pred_prob_all_test.cpu())
+rmse_test = mean_squared_error(target_all_test.cpu(), pred_prob_all_test.cpu(), squared=False)
+r_test, _ = pearsonr(target_all_test.cpu(), pred_prob_all_test.cpu())
 
 #testing stats
 legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".format(
@@ -57,10 +59,10 @@ legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".f
 )
 
 plt.figure(figsize=(4, 4), dpi=100)
-plt.scatter(target_all.cpu(), pred_prob_all.cpu(), alpha=0.3)
-plt.plot([min(target_all.cpu()), max(target_all.cpu())], [min(target_all.cpu()),
-                                                            max(target_all.cpu())], color="k", ls="--")
-plt.xlim([min(target_all.cpu()), max(target_all.cpu())])
+plt.scatter(target_all_test.cpu(), pred_prob_all_test.cpu(), alpha=0.3)
+plt.plot([min(target_all_test.cpu()), max(target_all_test.cpu())], [min(target_all_test.cpu()),
+                                                            max(target_all_test.cpu())], color="k", ls="--")
+plt.xlim([min(target_all_test.cpu()), max(target_all_test.cpu())])
 plt.title('Testing')
 plt.xlabel("True Values")
 plt.ylabel("Predicted Values")
@@ -69,9 +71,9 @@ plt.show()
 
 
 
-input_all = input_all.numpy()
-target_all = target_all.numpy()
-pred_prob_all = pred_prob_all.numpy()
+input_all_test = input_all_test.numpy()
+target_all_test = target_all_test.numpy()
+pred_prob_all_test = pred_prob_all_test.numpy()
 
 
 data_smile = {
@@ -79,7 +81,7 @@ data_smile = {
         "SMILEs"
     ],
     "Value": [
-        input_all,
+        input_all_test,
     ],
     
 }
@@ -90,7 +92,7 @@ data_temp = {
         "critical_temp",
     ],
     "Value": [
-        target_all,
+        target_all_test,
     ],
     
 }
@@ -100,31 +102,35 @@ data_p_temp = {
         "predicted temp"
     ],
     "Value": [
-        pred_prob_all
+        pred_prob_all_test
     ],
     
 }
 
 
 
-smile_input = []
+# smile_input = []
 
-for each in input_all:
-    mol = Chem.MolFromFingerprint(each)
-    if mol is not None:
-        # 2. Generate a SMILES string
-        smiles = Chem.MolToSmiles(mol)
-        smile_input.append(smiles)
-    else:
-        print("Could not convert the fingerprint to a molecule.")
+# for each in input_all_test:
+#     mol = Chem.MolFromSmiles(each)
+#     if mol is not None:
+#         # 2. Generate a SMILES string
+#         smiles = Chem.MolToSmiles(mol)
+#         smile_input.append(smiles)
+#     else:
+#         print("Could not convert the fingerprint to a molecule.")
 
-df1 = pd.DataFrame(smile_input)
+# df1 = pd.DataFrame(smile_input)
+# df1 = pd.DataFrame(input_all_test)
 
-df2 = pd.DataFrame(target_all)
-df3 = pd.DataFrame(pred_prob_all)
+# print(df1)
+#why on earth is it 11355 rows long? 
 
-combined_df = pd.concat([df1, df2, df3], ignore_index=True, axis=1)
-combined_df.columns = ['SMILEs', 'critical_temp', 'predicted_temp']
+df2 = pd.DataFrame(target_all_test)
+df3 = pd.DataFrame(pred_prob_all_test)
+
+combined_df = pd.concat([df2, df3], ignore_index=True, axis=1)
+combined_df.columns = ['critical_temp', 'predicted_temp']
 # ok need to make them into comlumns also to make the fingerprint back into SMILEs 
 # is that possible? 
 combined_df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp.csv', index=False)
