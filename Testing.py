@@ -30,19 +30,19 @@ model =  GCN_Temp(initial_dim_gcn, edge_dim_feature).to(device)
 
 batch_size = 10
 
-weights_file = "best_model_weights_new.pth"
+weights_file = "best_model_weights_09_07.pth"
 
 
 ## SET UP testing DATALOADERS: ---
-test_set = TempDataset()
-print(test_set)
+test_set = TempDataset(raw_name ='test_full.csv', processed_name='test_processed.pt')
+print(len(test_set)) # should be 116
 
 test_dataloader = DataLoader(test_set, batch_size, shuffle=True)
 
 input_all_test, target_all_test, pred_prob_all_test = predict(model, test_dataloader, device, weights_file)
 
 
-input_all_test = input_all_test.cpu()
+# input_all_test = input_all_test.cpu()
 target_all_test = target_all_test.cpu()
 pred_prob_all_test = pred_prob_all_test.cpu()
 
@@ -71,66 +71,13 @@ plt.show()
 
 
 
-input_all_test = input_all_test.numpy()
 target_all_test = target_all_test.numpy()
 pred_prob_all_test = pred_prob_all_test.numpy()
 
-
-data_smile = {
-    "Metric": [
-        "SMILEs"
-    ],
-    "Value": [
-        input_all_test,
-    ],
-    
-}
-
-
-data_temp = {
-    "Metric": [
-        "critical_temp",
-    ],
-    "Value": [
-        target_all_test,
-    ],
-    
-}
-
-data_p_temp = {
-    "Metric": [
-        "predicted temp"
-    ],
-    "Value": [
-        pred_prob_all_test
-    ],
-    
-}
-
-
-
-# smile_input = []
-
-# for each in input_all_test:
-#     mol = Chem.MolFromSmiles(each)
-#     if mol is not None:
-#         # 2. Generate a SMILES string
-#         smiles = Chem.MolToSmiles(mol)
-#         smile_input.append(smiles)
-#     else:
-#         print("Could not convert the fingerprint to a molecule.")
-
-# df1 = pd.DataFrame(smile_input)
-# df1 = pd.DataFrame(input_all_test)
-
-# print(df1)
-#why on earth is it 11355 rows long? 
 
 df2 = pd.DataFrame(target_all_test)
 df3 = pd.DataFrame(pred_prob_all_test)
 
 combined_df = pd.concat([df2, df3], ignore_index=True, axis=1)
-combined_df.columns = ['critical_temp', 'predicted_temp']
-# ok need to make them into comlumns also to make the fingerprint back into SMILEs 
-# is that possible? 
-combined_df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp.csv', index=False)
+combined_df.columns = ['critical_temp_test', 'predicted_temp_test']
+combined_df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp_test.csv', index=False)

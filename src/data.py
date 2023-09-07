@@ -5,7 +5,7 @@ import torch
 from torch_geometric.data import InMemoryDataset
 
 
-from utils import smiles2geodata, get_atom_features
+from src.utils import smiles2geodata, get_atom_features
 
 class TempDataset(InMemoryDataset):
     # message to future vanessa:
@@ -56,7 +56,8 @@ class TempDataset(InMemoryDataset):
         
             
             
-            
-data = TempDataset(raw_name = 'val_full.csv')
-print(len(data))
+# testing prints      
+# data = TempDataset(raw_name = 'train_full.csv', processed_name = 'training_processed.pt')
+# print(len(data))
+# data.process()
 # should be 921

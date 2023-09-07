@@ -1,4 +1,4 @@
-
+# # # # # # # # # #  replaces main.py # # # # # # # # # # # 
 import time
 import matplotlib.pyplot as plt
 import torch
@@ -39,14 +39,14 @@ print(len(train_set))
 
 # Build pytorch training and validation set dataloaders:
 batch_size = 10
-dataloader = DataLoader(data, batch_size, shuffle=True) ################################# like 80% sure this line does nothing
+
 
 
 train_dataloader = DataLoader(train_set, batch_size, shuffle=True)
 val_dataloader = DataLoader(val_set, batch_size, shuffle=True)
 
 
-# # # # # # # # # #  replaces main.py # # # # # # # # # # # 
+
 
 ## RUN TRAINING LOOP: ---
 
@@ -55,12 +55,12 @@ torch.manual_seed(0)
 
 
 ## SET UP MODEL
-# note to self- the number of features and the number of edge features is the same whether
-# using whole data for '.num_features' or just a combination of train/val data
-# Ask daniel what these are actually doing- how are these values aquired from the dataset
-initial_dim_gcn = data.num_features         #45
-edge_dim_feature = data.num_edge_features   #11
 
+initial_dim_gcn = data.num_features         #45?
+edge_dim_feature = data.num_edge_features   #11?
+
+print(initial_dim_gcn)
+print(edge_dim_feature)
 
 model =  GCN_Temp(initial_dim_gcn, edge_dim_feature).to(device)
 
@@ -87,41 +87,14 @@ for epoch in range(1, num_of_epochs): #TODO
     if val_loss < best_val_loss:
         best_val_loss = val_loss
         
-        torch.save(model.state_dict(), "best_model_weights_09_05.pth")
+        torch.save(model.state_dict(), "best_model_weights_09_07.pth")
 
 finish_time_training = time.time()
 time_training = finish_time_training -start_time_training
 
 
 #Testing:
-weights_file = "best_model_weights_09_05.pth"
-
-# test_set = TempDataset('/home/jbd3qn/Downloads/critical_temp_GCNN/test_full.csv')
-
-# test_dataloader = DataLoader(test_set, batch_size, shuffle=True)
-# input_all, target_all, pred_prob_all = predict(model, test_dataloader, device, weights_file)
-
-
-# r2_test = r2_score(target_all.cpu(), pred_prob_all.cpu())
-# mae_test = mean_absolute_error(target_all.cpu(), pred_prob_all.cpu())
-# rmse_test = mean_squared_error(target_all.cpu(), pred_prob_all.cpu(), squared=False)
-# r_test, _ = pearsonr(target_all.cpu(), pred_prob_all.cpu())
-
-# #testing stats
-# legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".format(
-#     r2_test, r_test , mae_test, rmse_test
-# )
-
-# plt.figure(figsize=(4, 4), dpi=100)
-# plt.scatter(target_all.cpu(), pred_prob_all.cpu(), alpha=0.3)
-# plt.plot([min(target_all.cpu()), max(target_all.cpu())], [min(target_all.cpu()),
-#                                                             max(target_all.cpu())], color="k", ls="--")
-# plt.xlim([min(target_all.cpu()), max(target_all.cpu())])
-# plt.title('Testing')
-# plt.xlabel("True Values")
-# plt.ylabel("Predicted Values")
-# plt.legend([legend_text], loc="lower right")
-# plt.show()
+weights_file = "best_model_weights_09_07.pth"
 
 
 #%%
@@ -213,15 +186,6 @@ data = {
         "num_edge_features",
         "initial_dim_gcn ",
         "edge_dim_feature",
-        # "hidden_dim_nn_1 ",
-        # "p1 ",
-        # "hidden_dim_nn_2 ",
-        # "p2 ",
-        # "hidden_dim_nn_3 ",
-        # "p3 ",
-        # "hidden_dim_fcn_1 ",
-        # "hidden_dim_fcn_2 ",
-        # "hidden_dim_fcn_3 ",
         "training split ",
         "validation split ",
         "batch_size", 
@@ -245,15 +209,6 @@ data = {
         data.num_edge_features,
         initial_dim_gcn,
         edge_dim_feature ,
-        # hidden_dim_nn_1 ,
-        # p1 ,
-        # hidden_dim_nn_2 ,
-        # p2 ,
-        # hidden_dim_nn_3,
-        # p3 ,
-        # hidden_dim_fcn_1 ,
-        # hidden_dim_fcn_2 ,
-        # hidden_dim_fcn_3 ,
         "Chemprop",
         "Chemprop",
         batch_size,
@@ -291,7 +246,7 @@ df3 = pd.DataFrame(target_all_val)
 df4 = pd.DataFrame(pred_prob_all_val)
 
 combined_df_1 = pd.concat([df3, df4], ignore_index=True, axis=1)
-combined_df_1.columns = ['critical_temp', 'predicted_temp']
+combined_df_1.columns = ['critical_temp_val', 'predicted_temp_val']
 combined_df_1.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp_val.csv', index=False)
 
 
@@ -308,5 +263,5 @@ df1 = pd.DataFrame(target_all_train)
 df2 = pd.DataFrame(pred_prob_all_train)
 
 combined_df = pd.concat([df1, df2], ignore_index=True, axis=1)
-combined_df.columns = ['critical_temp', 'predicted_temp']
-combined_df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp_testing.csv', index=False)
+combined_df.columns = ['critical_temp_train', 'predicted_temp_train']
+combined_df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp_training.csv', index=False)
