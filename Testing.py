@@ -12,7 +12,7 @@ from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 from scipy.stats import pearsonr
 import numpy as np
 from rdkit import Chem
- 
+
 
 
 # device information
