@@ -102,6 +102,33 @@ weights_file = "best_model_weights_09_07.pth"
 input_all_train, target_all_train, pred_prob_all_train = predict(model, train_dataloader, device, weights_file)
 
 
+target_all_train = target_all_train.cpu()
+target_all_train = target_all_train.numpy()
+
+plt.figure(figsize=(4, 4), dpi=100)
+plt.scatter(train_set.y, target_all_train.cpu(), alpha=0.3)
+plt.plot([min(train_set.y), max(train_set.y)], [min(train_set.y),
+                                                            max(train_set.y)], color="k", ls="--")
+plt.xlim([min(train_set.y), max(train_set.y)])
+plt.title('Testing')
+plt.xlabel("test_set")
+plt.ylabel("target_all_test")
+# plt.legend([legend_text], loc="lower right")
+plt.show()
+
+df = pd.DataFrame(target_all_train)
+df2 = pd.DataFrame(train_set.y)
+combine_df = pd.concat([df2, df], ignore_index=True, axis=1)
+combine_df.columns = ['Pre_model_true_temp', 'post_model_true_temp']
+combine_df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/train_pre_post_critical_T.csv', index=False)
+
+
+
+
+
+#%%
+
+
 r2_train = r2_score(target_all_train.cpu(), pred_prob_all_train.cpu())
 mae_train = mean_absolute_error(target_all_train.cpu(), pred_prob_all_train.cpu())
 rmse_train = mean_squared_error(target_all_train.cpu(), pred_prob_all_train.cpu(), squared=False)
