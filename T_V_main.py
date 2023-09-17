@@ -1,3 +1,5 @@
+#%%
+
 # # # # # # # # # #  replaces main.py # # # # # # # # # # # 
 import time
 import matplotlib.pyplot as plt
@@ -21,7 +23,7 @@ start_time = time.time()
 
 ## SET UP DATALOADERS: ---
 
-data = TempDataset(raw_name ='train_val_full.csv', processed_name='train_val_processed.pt')
+data = TempDataset(raw_name ='train_full.csv', processed_name='train_processed.pt')
 print('Number of NODES features: ', data.num_features)
 print('Number of EDGES features: ', data.num_edge_features)
 #################################
@@ -38,12 +40,12 @@ print(len(val_set))
 print(len(train_set))
 
 # Build pytorch training and validation set dataloaders:
-batch_size = 10
+batch_size = 2
 
 
 
-train_dataloader = DataLoader(train_set, batch_size, shuffle=True)
-val_dataloader = DataLoader(val_set, batch_size, shuffle=True)
+train_dataloader = DataLoader(train_set, batch_size, shuffle=False)
+val_dataloader = DataLoader(val_set, batch_size, shuffle=False)
 
 
 
@@ -56,14 +58,15 @@ torch.manual_seed(0)
 
 ## SET UP MODEL
 
+# are these the averages? 
 initial_dim_gcn = data.num_features         #45?
 edge_dim_feature = data.num_edge_features   #11?
 
 print(initial_dim_gcn)
 print(edge_dim_feature)
 
-model =  GCN_Temp(initial_dim_gcn, edge_dim_feature).to(device)
-
+model =  GCN_Temp( initial_dim_gcn, edge_dim_feature).to(device)
+# print(x.shape)
 
 # Set up optimizer:
 learning_rate = 1e-3
@@ -241,7 +244,7 @@ pred_prob_all_val = pred_prob_all_val.cpu()
 target_all_val = target_all_val.numpy()
 pred_prob_all_val = pred_prob_all_val.numpy()
 
-
+# creating csv file of true critical temps and predicted temps for validation
 df3 = pd.DataFrame(target_all_val)
 df4 = pd.DataFrame(pred_prob_all_val)
 
@@ -258,7 +261,16 @@ pred_prob_all_train = pred_prob_all_train.cpu()
 target_all_train = target_all_train.numpy()
 pred_prob_all_train = pred_prob_all_train.numpy()
 
+# creating a csv file of the true critical temps entering the model and true critical temps exiting the model
+# further comparison analysis in matching_in_out.py
+df = pd.DataFrame(target_all_train)
+dfa = pd.DataFrame(train_set.y)
+combine_df = pd.concat([dfa, df], ignore_index=True, axis=1)
+combine_df.columns = ['Pre_model_true_temp', 'post_model_true_temp']
+combine_df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/train_pre_post_critical_T.csv', index=False)
 
+
+# creating csv file of true critical temps and predicted temps for training
 df1 = pd.DataFrame(target_all_train)
 df2 = pd.DataFrame(pred_prob_all_train)
 

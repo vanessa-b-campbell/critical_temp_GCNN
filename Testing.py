@@ -1,3 +1,4 @@
+#%%
 import time
 import matplotlib.pyplot as plt
 import torch
@@ -22,6 +23,7 @@ device = device_information.device
 
 # Set up model:
 
+# do not hard code this
 initial_dim_gcn = 45
 edge_dim_feature = 11
 
@@ -34,24 +36,30 @@ weights_file = "best_model_weights_09_07.pth"
 
 
 ## SET UP testing DATALOADERS: ---
-test_set = TempDataset(raw_name ='test_full.csv', processed_name='test_processed.pt')
-print(len(test_set)) # should be 116
+test_set = TempDataset(raw_name ='test_full.csv', processed_name='test_processed_small.pt')
+print(len(test_set)) # should be 5
 
-test_dataloader = DataLoader(test_set, batch_size, shuffle=True)
+
+test_dataloader = DataLoader(test_set, batch_size, shuffle=False)
 
 input_all_test, target_all_test, pred_prob_all_test = predict(model, test_dataloader, device, weights_file)
 
 
 # input_all_test = input_all_test.cpu()
 target_all_test = target_all_test.cpu()
+print(target_all_test)
+
 pred_prob_all_test = pred_prob_all_test.cpu()
 
+#create small dataset to truly fucking tell if the same critical termaptures are coming out!!!
 
 
-r2_test = r2_score(target_all_test.cpu(), pred_prob_all_test.cpu())
-mae_test = mean_absolute_error(target_all_test.cpu(), pred_prob_all_test.cpu())
-rmse_test = mean_squared_error(target_all_test.cpu(), pred_prob_all_test.cpu(), squared=False)
-r_test, _ = pearsonr(target_all_test.cpu(), pred_prob_all_test.cpu())
+
+# out of order!!!?????!?!??!?!?!?!?!?!?!?
+r2_test = r2_score(target_all_test, pred_prob_all_test.cpu())
+mae_test = mean_absolute_error(target_all_test, pred_prob_all_test.cpu())
+rmse_test = mean_squared_error(target_all_test, pred_prob_all_test.cpu(), squared=False)
+r_test, _ = pearsonr(target_all_test, pred_prob_all_test.cpu())
 
 #testing stats
 legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".format(
@@ -59,10 +67,10 @@ legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".f
 )
 
 plt.figure(figsize=(4, 4), dpi=100)
-plt.scatter(target_all_test.cpu(), pred_prob_all_test.cpu(), alpha=0.3)
-plt.plot([min(target_all_test.cpu()), max(target_all_test.cpu())], [min(target_all_test.cpu()),
-                                                            max(target_all_test.cpu())], color="k", ls="--")
-plt.xlim([min(target_all_test.cpu()), max(target_all_test.cpu())])
+plt.scatter(target_all_test, pred_prob_all_test.cpu(), alpha=0.3)
+plt.plot([min(target_all_test), max(target_all_test)], [min(target_all_test),
+                                                            max(target_all_test)], color="k", ls="--")
+plt.xlim([min(target_all_test), max(target_all_test)])
 plt.title('Testing')
 plt.xlabel("True Values")
 plt.ylabel("Predicted Values")
@@ -74,10 +82,17 @@ plt.show()
 target_all_test = target_all_test.numpy()
 pred_prob_all_test = pred_prob_all_test.numpy()
 
+df = pd.DataFrame(target_all_test)
 
-df2 = pd.DataFrame(target_all_test)
+
+df1 = pd.DataFrame(test_set.x)
+df2 = pd.DataFrame(test_set.y)
 df3 = pd.DataFrame(pred_prob_all_test)
 
-combined_df = pd.concat([df2, df3], ignore_index=True, axis=1)
-combined_df.columns = ['critical_temp_test', 'predicted_temp_test']
+combine_df = pd.concat([df2, df], ignore_index=True, axis=1)
+combine_df.columns = ['Pre_model_true_temp', 'post_model_true_temp']
+combine_df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/pre_post_critical_T.csv', index=False)
+
+combined_df = pd.concat([df1, df2, df3], ignore_index=True, axis=1)
+combined_df.columns = ['SMILES', 'critical_temp_test', 'predicted_temp_test']
 combined_df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp_test.csv', index=False)
