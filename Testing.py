@@ -79,38 +79,6 @@ plt.show()
 
 
 
-
-
-
-
-
-
-# r2_test = r2_score(target_all_test.cpu(), pred_prob_all_test.cpu())
-# mae_test = mean_absolute_error(target_all_test.cpu(), pred_prob_all_test.cpu())
-# rmse_test = mean_squared_error(target_all_test.cpu(), pred_prob_all_test.cpu(), squared=False)
-# r_test, _ = pearsonr(target_all_test.cpu(), pred_prob_all_test.cpu())
-
-# #testing stats
-# legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".format(
-#     r2_test, r_test , mae_test, rmse_test
-# )
-
-# plt.figure(figsize=(4, 4), dpi=100)
-# plt.scatter(target_all_test.cpu(), pred_prob_all_test.cpu(), alpha=0.3)
-# plt.plot([min(target_all_test.cpu()), max(target_all_test.cpu())], [min(target_all_test.cpu()),
-#                                                             max(target_all_test.cpu())], color="k", ls="--")
-# plt.xlim([min(target_all_test.cpu()), max(target_all_test.cpu())])
-# plt.title('Testing')
-# plt.xlabel("True Values")
-# plt.ylabel("Predicted Values")
-# plt.legend([legend_text], loc="lower right")
-# plt.show()
-
-
-
-
-
-
 target_all_test = target_all_test.numpy()
 pred_prob_all_test = pred_prob_all_test.numpy()
 
