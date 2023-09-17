@@ -10,9 +10,9 @@ test_list_GCNN = list(zip(smiles, temp_column, predict_column))
 ###### bring in the validation data
 val_data = pd.read_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp_val.csv')
 # smiles = val_data.iloc[:,0].tolist()
-temp_column = val_data.iloc[:,0].tolist()
-predict_column = val_data.iloc[:,1].tolist()
-val_list_GCNN = list(zip(temp_column, predict_column))
+temp_column_val = val_data.iloc[:,0].tolist()
+predict_column_val = val_data.iloc[:,1].tolist()
+val_list_GCNN = list(zip(temp_column_val, predict_column_val))
 
 
 

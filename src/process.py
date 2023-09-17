@@ -95,9 +95,15 @@ def predict(model, dataloader, device, weights_file):
             X_all.append(batch.x.to(device))
             y_all.append(batch.y.to(device))
             pred_all.append(pred.to(device))
+            # dir(graph(x)) = smile
+            # append(smile)
+            # create a csv (smile, real value (y), pred())
 
     X_all = torch.concat(X_all)
     y_all = torch.concat(y_all)
     pred_all = torch.concat(pred_all)
 
     return X_all, y_all, pred_all
+
+######### create a dicitionary in utils.py to keep together graphs and SMILES
+######### do this instead of converting to csv in model.py

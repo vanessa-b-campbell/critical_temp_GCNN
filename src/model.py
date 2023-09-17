@@ -45,8 +45,10 @@ class GCN_Temp(torch.nn.Module):
         self.linear4 = nn.Linear(hidden_dim_fcn_3, 1)
 
     def forward(self, data):
-        x, edge_index, edge_attr = data.x, data.edge_index, data.edge_attr
 
+        x, edge_index, edge_attr = data.x, data.edge_index, data.edge_attr
+        # atoms,   how they are connected 
+        
         x = self.nn_conv_1(x, edge_index, edge_attr)
         x = F.relu(x)
         x = self.dropout_1(x)
@@ -61,6 +63,7 @@ class GCN_Temp(torch.nn.Module):
         
         x = self.readout(x, data.batch)
 
+# linear layers 1x1 matrix
         x = self.linear1(x)
         x = F.relu(x)
         x = self.linear2(x)

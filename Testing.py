@@ -1,3 +1,4 @@
+#%%
 import time
 import matplotlib.pyplot as plt
 import torch
@@ -22,6 +23,7 @@ device = device_information.device
 
 # Set up model:
 
+# do not hard code this
 initial_dim_gcn = 45
 edge_dim_feature = 11
 
@@ -34,8 +36,8 @@ weights_file = "best_model_weights_09_07.pth"
 
 
 ## SET UP testing DATALOADERS: ---
-test_set = TempDataset(raw_name ='test_full.csv', processed_name='test_processed.pt')
-print(len(test_set)) # should be 116
+test_set = TempDataset(raw_name ='test_full.csv', processed_name='test_processed_small.pt')
+print(len(test_set)) # should be 5
 
 
 test_dataloader = DataLoader(test_set, batch_size, shuffle=False)
@@ -49,12 +51,15 @@ print(target_all_test)
 
 pred_prob_all_test = pred_prob_all_test.cpu()
 
+#create small dataset to truly fucking tell if the same critical termaptures are coming out!!!
 
 
-r2_test = r2_score(test_set.y, pred_prob_all_test.cpu())
-mae_test = mean_absolute_error(test_set.y, pred_prob_all_test.cpu())
-rmse_test = mean_squared_error(test_set.y, pred_prob_all_test.cpu(), squared=False)
-r_test, _ = pearsonr(test_set.y, pred_prob_all_test.cpu())
+
+# out of order!!!?????!?!??!?!?!?!?!?!?!?
+r2_test = r2_score(target_all_test, pred_prob_all_test.cpu())
+mae_test = mean_absolute_error(target_all_test, pred_prob_all_test.cpu())
+rmse_test = mean_squared_error(target_all_test, pred_prob_all_test.cpu(), squared=False)
+r_test, _ = pearsonr(target_all_test, pred_prob_all_test.cpu())
 
 #testing stats
 legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".format(
@@ -62,10 +67,10 @@ legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".f
 )
 
 plt.figure(figsize=(4, 4), dpi=100)
-plt.scatter(test_set.y, pred_prob_all_test.cpu(), alpha=0.3)
-plt.plot([min(test_set.y), max(test_set.y)], [min(test_set.y),
-                                                            max(test_set.y)], color="k", ls="--")
-plt.xlim([min(test_set.y), max(test_set.y)])
+plt.scatter(target_all_test, pred_prob_all_test.cpu(), alpha=0.3)
+plt.plot([min(target_all_test), max(target_all_test)], [min(target_all_test),
+                                                            max(target_all_test)], color="k", ls="--")
+plt.xlim([min(target_all_test), max(target_all_test)])
 plt.title('Testing')
 plt.xlabel("True Values")
 plt.ylabel("Predicted Values")
@@ -102,17 +107,6 @@ plt.show()
 # plt.show()
 
 
-
-plt.figure(figsize=(4, 4), dpi=100)
-plt.scatter(test_set.y, target_all_test.cpu(), alpha=0.3)
-plt.plot([min(test_set.y), max(test_set.y)], [min(test_set.y),
-                                                            max(test_set.y)], color="k", ls="--")
-plt.xlim([min(test_set.y), max(test_set.y)])
-plt.title('Testing')
-plt.xlabel("test_set")
-plt.ylabel("target_all_test")
-plt.legend([legend_text], loc="lower right")
-plt.show()
 
 
 

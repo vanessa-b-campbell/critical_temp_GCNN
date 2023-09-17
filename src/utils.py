@@ -8,6 +8,10 @@ from rdkit import Chem
 from sklearn.preprocessing import OneHotEncoder
 
 
+# convert each molecule to a graph 
+# nodes are atoms
+# edges are bonds
+
 def smiles2geodata(smile, y, node_features_dict, edge_features_dict):
     molecule = Chem.MolFromSmiles(smile)
     
@@ -35,10 +39,13 @@ def smiles2geodata(smile, y, node_features_dict, edge_features_dict):
     
     edges = get_edge_indices(molecule)
     
+    # data class that has the dataset - edge features with edge index
     geo_dp = Data(x=nodes_features, edge_index=edges, edge_attr=edges_features, y=y)
     
     return geo_dp
 
+
+# creates the dictionaries 
 def get_atom_features(smile_list):
     #nodes
     atomic_number = []
@@ -56,12 +63,14 @@ def get_atom_features(smile_list):
     for smi in smile_list:
         molecule = Chem.MolFromSmiles(smi)
         
+        #nodes
         atomic_number.extend([atom.GetAtomicNum() for atom in molecule.GetAtoms()])
         aromaticity.extend([int(atom.GetIsAromatic()) for atom in molecule.GetAtoms()])
         num_bonds.extend([atom.GetDegree() for atom in molecule.GetAtoms()])
         bonded_hydrogens.extend([atom.GetTotalNumHs() for atom in molecule.GetAtoms()])
         hybridization.extend([atom.GetHybridization().real for atom in molecule.GetAtoms()])
         
+        #edges
         for bond in molecule.GetBonds():
             bond_type.extend([bond.GetBondTypeAsDouble()])
             in_ring.extend([int(bond.IsInRing())])
@@ -73,6 +82,9 @@ def get_atom_features(smile_list):
     codificador_atomic = OneHotEncoder()
     codificador_atomic.fit(np.array(atomic_set).reshape(-1,1))
     
+    # can modify features - more representative to molecular properies- boiling point etc. --- number of electron the molecule has? (atom.getBoilgPoint)
+    # atomic mass, hydrogen bond acceptors
+    # Daniel's powerpoint --- in box---- google in RDkit
     aromatic_set = list(set(aromaticity))
     codificador_aromatic = OneHotEncoder()
     codificador_aromatic.fit(np.array(aromatic_set).reshape(-1,1))
@@ -135,6 +147,9 @@ def get_atom_features(smile_list):
     
     return features_dict, edge_features_dict
 
+
+# creating how nodes are connected in the graphs 
+# edge index - 2xnumber of atoms (nodes)
 def get_edge_indices(molecule):
     
     edges =[]
