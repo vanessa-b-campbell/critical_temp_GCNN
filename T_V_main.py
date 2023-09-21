@@ -36,7 +36,7 @@ time_preprocessing = (finish_time_preprocessing - finish_time_preprocessing) / 6
 # Set up model:
 val_set = TempDataset(raw_name = 'val_full.csv', processed_name = 'val_processed.pt')
 train_set = TempDataset(raw_name = 'train_full.csv', processed_name = 'train_processed.pt')
-print(len(val_set))
+print(len(val_set)) # returns length of val_set.y
 print(len(train_set))
 
 # Build pytorch training and validation set dataloaders:
@@ -65,7 +65,7 @@ edge_dim_feature = data.num_edge_features   #11?
 print(initial_dim_gcn)
 print(edge_dim_feature)
 
-model =  GCN_Temp( initial_dim_gcn, edge_dim_feature).to(device)
+model =  GCN_Temp(initial_dim_gcn, edge_dim_feature).to(device)
 # print(x.shape)
 
 # Set up optimizer:
@@ -103,6 +103,7 @@ weights_file = "best_model_weights_09_07.pth"
 #%%
 # Training:
 input_all_train, target_all_train, pred_prob_all_train = predict(model, train_dataloader, device, weights_file)
+
 
 
 r2_train = r2_score(target_all_train.cpu(), pred_prob_all_train.cpu())

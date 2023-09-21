@@ -5,7 +5,7 @@ import torch
 from torch_geometric.data import InMemoryDataset
 
 
-from src.utils import smiles2geodata, get_atom_features
+from utils import smiles2geodata, get_atom_features
 
 class TempDataset(InMemoryDataset):
             
@@ -44,7 +44,7 @@ class TempDataset(InMemoryDataset):
 
     def process(self):
         
-        node_features_dict, edge_features_dict = get_atom_features(self.x)
+        node_features_dict, edge_features_dict, graph_smiles_dict = get_atom_features(self.x)
 
         data_list = [smiles2geodata(x,y,node_features_dict, edge_features_dict) for x,y in zip(self.x,self.y)]
         
@@ -53,10 +53,11 @@ class TempDataset(InMemoryDataset):
         torch.save((data, slices), self.processed_paths[0])
         
         
-            
-            
+        
+        
 # testing prints      
-# data = TempDataset(raw_name = 'train_full.csv', processed_name = 'training_processed.pt')
-# print(len(data))
-# data.process()
+data = TempDataset(raw_name = 'train_full.csv', processed_name = 'training_processed.pt')
+print(len(data))
+data.process()
 # should be 921
+

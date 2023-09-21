@@ -42,11 +42,14 @@ def smiles2geodata(smile, y, node_features_dict, edge_features_dict):
     # data class that has the dataset - edge features with edge index
     geo_dp = Data(x=nodes_features, edge_index=edges, edge_attr=edges_features, y=y)
     
-    return geo_dp
+    return geo_dp # create another output in return line
 
 
 # creates the dictionaries 
 def get_atom_features(smile_list):
+    
+    graph_smiles = []
+    
     #nodes
     atomic_number = []
     aromaticity = []
@@ -145,7 +148,7 @@ def get_atom_features(smile_list):
         edge_features_dict[edge_key_features_combined] = feature_edge
         
     
-    return features_dict, edge_features_dict
+    return features_dict, edge_features_dict, graph_smiles_dict ##########
 
 
 # creating how nodes are connected in the graphs 
@@ -162,19 +165,38 @@ def get_edge_indices(molecule):
 
 
 
-# lista_smile = ['Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14', 
-#             'COc1cc(OC)c(cc1NC(=O)CSCC(=O)O)S(=O)(=O)N2C(C)CCc3ccccc23', 
-#             'CS(=O)(=O)c1ccccc1C(=O)NC[C@@H](O)CN2CCC(CC2)Oc3ccc(Cl)c(Cl)c3', 
-#             'CC(C)N(CCC(C(=O)N)(c1ccccc1)c2ccccn2)C(C)C',
-#             'Cc1cc(CCC2CCN(CC2)S(=O)(=O)CC3(CCOCC3)N(O)C=O)c(C)cn1'
-#             ]
+lista_smile = ['Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14'
+            #'COc1cc(OC)c(cc1NC(=O)CSCC(=O)O)S(=O)(=O)N2C(C)CCc3ccccc23' 
+            # 'CS(=O)(=O)c1ccccc1C(=O)NC[C@@H](O)CN2CCC(CC2)Oc3ccc(Cl)c(Cl)c3', 
+            # 'CC(C)N(CCC(C(=O)N)(c1ccccc1)c2ccccn2)C(C)C',
+            # 'Cc1cc(CCC2CCN(CC2)S(=O)(=O)CC3(CCOCC3)N(O)C=O)c(C)cn1'
+            ]
 
 
 
-# features = get_atom_features(lista_smile)
+features, edge_features = get_atom_features(lista_smile)
 
-# print(features) 
-# num_keys = len(features)
+print(features) # this is a dictionary
+print(edge_features) # this is a dictionary
+
+
+# # length of dictioanry
+# # dictionary {key: value}
+num_keys = len(features) # 9 keys:
+# # 1. atomic_number
+# # 2. aromaticity 
+# # 3. num_bonds
+# # 4. bonded_hydrogens
+# # 5. hybridization
+# ##edges
+# # 6. bond_type 
+# # 7. in_ring 
+# # 8. conjugated 
+# # 9. stereo 
 # print("Number of keys in the dictionary:", num_keys)
-# value_dims = [len(value) for value in features.values()]
+num_edges = len(edge_features) # 
+print(num_edges) # this
+
+# # length of graphs (aka the length of the dictionary feautures' values)
+# value_dims = [len(value) for value in features.values()] # 14
 # print("Dimensions of dictionary values:", value_dims)

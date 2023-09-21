@@ -102,6 +102,9 @@ def predict(model, dataloader, device, weights_file):
     X_all = torch.concat(X_all)
     y_all = torch.concat(y_all)
     pred_all = torch.concat(pred_all)
+    
+    # dictionary of SMILES and fingerprints
+    ########################################################################### right here create csv
 
     return X_all, y_all, pred_all
 
