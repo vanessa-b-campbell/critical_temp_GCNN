@@ -34,8 +34,11 @@ time_preprocessing = (finish_time_preprocessing - finish_time_preprocessing) / 6
 
 
 # Set up model:
-val_set = TempDataset(raw_name = 'val_full.csv', processed_name = 'val_processed.pt')
-train_set = TempDataset(raw_name = 'train_full.csv', processed_name = 'train_processed.pt')
+raw_name_val = 'val_full.csv'
+val_set = TempDataset(raw_name_val, processed_name = 'val_processed.pt')
+
+raw_name_train = 'train_full.csv'
+train_set = TempDataset(raw_name_train, processed_name = 'train_processed.pt')
 print(len(val_set))
 print(len(train_set))
 
@@ -205,15 +208,16 @@ data = {
         "time_preprocessing", 
         "time_training",
         "time_prediction",
-        "total_time"
+        "total_time",
+        "weights_file"
     ],
     "Value": [
         data.num_features,
         data.num_edge_features,
         initial_dim_gcn,
         edge_dim_feature ,
-        "Chemprop",
-        "Chemprop",
+        raw_name_train,
+        raw_name_val,
         batch_size,
         learning_rate,
         num_of_epochs,
@@ -228,7 +232,8 @@ data = {
         time_preprocessing, 
         time_training,
         time_prediction,
-        total_time
+        total_time,
+        weights_file
     ],
     
 }

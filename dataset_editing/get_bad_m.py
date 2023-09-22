@@ -1,14 +1,15 @@
 import pandas as pd
 
 ###### bring in the testing data
-testing_data = pd.read_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp_test.csv')
+# testing_data = pd.read_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp_test.csv')
+testing_data = pd.read_csv('C:\\Users\\color\\Documents\\Bilodeau_Research_Python\\Critical_Temp_Research\\GCNN_branch_2\\critical_temp_GCNN\\predicted_temp_test.csv')
 smiles = testing_data.iloc[:,0].tolist()
 temp_column = testing_data.iloc[:,1].tolist()
 predict_column = testing_data.iloc[:,2].tolist()
 test_list_GCNN = list(zip(smiles, temp_column, predict_column))
 
 ###### bring in the validation data
-val_data = pd.read_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp_val.csv')
+val_data = pd.read_csv('C:\\Users\\color\\Documents\\Bilodeau_Research_Python\\Critical_Temp_Research\\GCNN_branch_2\\critical_temp_GCNN\\predicted_temp_val.csv')
 # smiles = val_data.iloc[:,0].tolist()
 temp_column_val = val_data.iloc[:,0].tolist()
 predict_column_val = val_data.iloc[:,1].tolist()
@@ -51,7 +52,7 @@ for each in mol_test:
         
 # for each in bad_mol:
 #     print(each)
- 
+
 # print(len(bad_mol)/2)
 
 # percent =( (len(bad_mol)/2)/ len(smiles) )* 100

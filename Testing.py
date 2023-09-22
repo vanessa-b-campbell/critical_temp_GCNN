@@ -16,6 +16,7 @@ from rdkit import Chem
 
 
 
+
 # device information
 device_information = device_info()
 print(device_information)
@@ -36,7 +37,8 @@ weights_file = "best_model_weights_09_07.pth"
 
 
 ## SET UP testing DATALOADERS: ---
-test_set = TempDataset(raw_name ='test_full.csv', processed_name='test_processed_small.pt')
+raw_name ='test_full.csv'
+test_set = TempDataset(raw_name , processed_name='test_processed_small.pt')
 print(len(test_set)) # should be 5
 
 
@@ -79,20 +81,77 @@ plt.show()
 
 
 
-target_all_test = target_all_test.numpy()
-pred_prob_all_test = pred_prob_all_test.numpy()
+data = {
+    "Metric": [
+        "initial_dim_gcn ",
+        "edge_dim_feature",
+        "testing split ",
+        "batch_size", 
+        "learning_rate",
+        "number_of_epochs",
+        "r2_test",
+        "r_test",
+        "mae_test",
+        "rmse_test", 
+        # "time_preprocessing", 
+        # "time_training",
+        # "time_prediction",
+        # "total_time",
+        "weights_file"
+    ],
+    "Value": [
+        initial_dim_gcn,
+        edge_dim_feature,
+        raw_name,
+        batch_size,
+        r2_test, 
+        r_test, 
+        mae_test, 
+        rmse_test,
+        # time_preprocessing, 
+        # time_training,
+        # time_prediction,
+        # total_time,
+        weights_file
+    ],
+    
+}
 
-df = pd.DataFrame(target_all_test)
 
 
-df1 = pd.DataFrame(test_set.x)
-df2 = pd.DataFrame(test_set.y)
-df3 = pd.DataFrame(pred_prob_all_test)
 
-combine_df = pd.concat([df2, df], ignore_index=True, axis=1)
-combine_df.columns = ['Pre_model_true_temp', 'post_model_true_temp']
-combine_df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/pre_post_critical_T.csv', index=False)
 
-combined_df = pd.concat([df1, df2, df3], ignore_index=True, axis=1)
-combined_df.columns = ['SMILES', 'critical_temp_test', 'predicted_temp_test']
-combined_df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp_test.csv', index=False)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########################## this needs to be done in utils.py 
+
+
+# target_all_test = target_all_test.numpy()
+# pred_prob_all_test = pred_prob_all_test.numpy()
+
+# df = pd.DataFrame(target_all_test)
+
+
+# df1 = pd.DataFrame(test_set.x)
+# df2 = pd.DataFrame(test_set.y)
+# df3 = pd.DataFrame(pred_prob_all_test)
+
+# combine_df = pd.concat([df2, df], ignore_index=True, axis=1)
+# combine_df.columns = ['Pre_model_true_temp', 'post_model_true_temp']
+# combine_df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/pre_post_critical_T.csv', index=False)
+
+# combined_df = pd.concat([df1, df2, df3], ignore_index=True, axis=1)
+# combined_df.columns = ['SMILES', 'critical_temp_test', 'predicted_temp_test']
+# combined_df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp_test.csv', index=False)

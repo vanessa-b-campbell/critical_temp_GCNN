@@ -106,4 +106,4 @@ def predict(model, dataloader, device, weights_file):
     return X_all, y_all, pred_all
 
 ######### create a dicitionary in utils.py to keep together graphs and SMILES
-######### do this instead of converting to csv in model.py
+######### do this instead of converting to csv in model.py and create csv in predict function
