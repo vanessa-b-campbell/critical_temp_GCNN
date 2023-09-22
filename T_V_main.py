@@ -68,7 +68,7 @@ edge_dim_feature = data.num_edge_features   #11?
 print(initial_dim_gcn)
 print(edge_dim_feature)
 
-model =  GCN_Temp( initial_dim_gcn, edge_dim_feature).to(device)
+model =  GCN_Temp(initial_dim_gcn, edge_dim_feature).to(device)
 # print(x.shape)
 
 # Set up optimizer:
@@ -106,6 +106,7 @@ weights_file = "best_model_weights_09_07.pth"
 #%%
 # Training:
 input_all_train, target_all_train, pred_prob_all_train = predict(model, train_dataloader, device, weights_file)
+
 
 
 r2_train = r2_score(target_all_train.cpu(), pred_prob_all_train.cpu())
