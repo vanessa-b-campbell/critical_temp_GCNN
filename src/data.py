@@ -13,6 +13,10 @@ class TempDataset(InMemoryDataset):
     def __init__(self, root='/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv',raw_name = None ,processed_name=None, transform=None, pre_transform=None, pre_filter=None, log=True):
         self.filename = os.path.join(root,raw_name)
         #self.processed_filename = os.path.join(root,processed_name)
+        # make root gerneral
+        # 3 diferent folders in chemprop_splits_csv train/testing/val
+        # get rid of processed name it's doing nothing
+        # track down data.pt
         ########################################################################- do I need line 15? it is commmented out in lipofilicity_PyGeo
         
         # read a csv from that path:
