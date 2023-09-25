@@ -162,11 +162,11 @@ def get_edge_indices(molecule):
 
 
 
-# lista_smile = ['Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14', 
-#             'COc1cc(OC)c(cc1NC(=O)CSCC(=O)O)S(=O)(=O)N2C(C)CCc3ccccc23', 
-#             'CS(=O)(=O)c1ccccc1C(=O)NC[C@@H](O)CN2CCC(CC2)Oc3ccc(Cl)c(Cl)c3', 
-#             'CC(C)N(CCC(C(=O)N)(c1ccccc1)c2ccccn2)C(C)C',
-#             'Cc1cc(CCC2CCN(CC2)S(=O)(=O)CC3(CCOCC3)N(O)C=O)c(C)cn1'
+# lista_smile = ['Cn1c(CN2CCN(CC2)c3ccc(Cl)cc3)nc4ccccc14'
+# #             'COc1cc(OC)c(cc1NC(=O)CSCC(=O)O)S(=O)(=O)N2C(C)CCc3ccccc23', 
+# #             'CS(=O)(=O)c1ccccc1C(=O)NC[C@@H](O)CN2CCC(CC2)Oc3ccc(Cl)c(Cl)c3', 
+# #             'CC(C)N(CCC(C(=O)N)(c1ccccc1)c2ccccn2)C(C)C',
+# #             'Cc1cc(CCC2CCN(CC2)S(=O)(=O)CC3(CCOCC3)N(O)C=O)c(C)cn1'
 #             ]
 
 

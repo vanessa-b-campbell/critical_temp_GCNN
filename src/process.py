@@ -1,5 +1,5 @@
 import torch
-
+import pandas as pd
 
 def train(model, device, dataloader, optim, epoch):
     
@@ -73,7 +73,7 @@ def validation(model, device, dataloader, epoch):
 
 
 
-def predict(model, dataloader, device, weights_file):
+def predict(model, dataloader, device, weights_file, file_path_name):
 
     # Set our model to evaluation mode:
     model.eval()
@@ -102,6 +102,22 @@ def predict(model, dataloader, device, weights_file):
     X_all = torch.concat(X_all)
     y_all = torch.concat(y_all)
     pred_all = torch.concat(pred_all)
+
+
+    y_all = y_all.cpu()
+    pred_all = pred_all.cpu()
+
+    y_all = y_all.numpy()
+    pred_all = pred_all.numpy()
+
+    # creating csv file of true critical temps and predicted temps for validation
+    df1 = pd.DataFrame(y_all)
+    df2 = pd.DataFrame(pred_all)
+
+    combine_df = pd.concat([df1, df2], ignore_index=True, axis=1)
+    combine_df.columns = ['true_temp', 'pred_temp']
+    combine_df.to_csv(file_path_name, index=False)
+
 
     return X_all, y_all, pred_all
 

@@ -33,21 +33,22 @@ model =  GCN_Temp(initial_dim_gcn, edge_dim_feature).to(device)
 
 batch_size = 10
 
-weights_file = "best_model_weights_09_07.pth"
+weights_file = "best_model_weights_09_25.pth"
 
 
 ## SET UP testing DATALOADERS: ---
 raw_name ='test_full.csv'
-test_set = TempDataset(raw_name , processed_name='test_processed_small.pt')
+test_set = TempDataset(root = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv', raw_name = raw_name )
 print(len(test_set)) # should be 5
 
 
 test_dataloader = DataLoader(test_set, batch_size, shuffle=False)
 
-input_all_test, target_all_test, pred_prob_all_test = predict(model, test_dataloader, device, weights_file)
+input_all_test, target_all_test, pred_prob_all_test = predict(model, test_dataloader, device, weights_file, 
+                                                            file_path_name = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/test_predict.csv' )
 
 
-# input_all_test = input_all_test.cpu()
+#input_all_test = input_all_test.cpu()
 target_all_test = target_all_test.cpu()
 print(target_all_test)
 
