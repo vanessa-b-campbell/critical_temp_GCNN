@@ -22,28 +22,29 @@ device = device_information.device
 start_time = time.time()
 
 ## SET UP DATALOADERS: ---
-data = TempDataset(root = '/home/jbd3qn/Downloads/critical_temp_GCNN', raw_name = 'train_val_full.csv')
+# data = TempDataset(root = '/home/jbd3qn/Downloads/critical_temp_GCNN', raw_name = 'train_val_full.csv')
+raw_name_train = 'train_full.csv'
+root_train = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/training'
+train_set = TempDataset(root =root_train , raw_name = raw_name_train)
 
-print('Number of NODES features: ', data.num_features)
-print('Number of EDGES features: ', data.num_edge_features)
+print(len(train_set))
+
+print('Number of NODES features: ', train_set.num_features)
+print('Number of EDGES features: ', train_set.num_edge_features)
 
 finish_time_preprocessing = time.time()
 time_preprocessing = (finish_time_preprocessing - finish_time_preprocessing) / 60
 
-# checking
 
 # Build pytorch training and validation set dataloaders:
 batch_size = 10
 
 
 raw_name_val = 'val_full.csv'
-val_set = TempDataset(root = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation', raw_name= raw_name_val)
-
-raw_name_train = 'train_full.csv'
-train_set = TempDataset(root = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/training', raw_name = raw_name_train)
-
+root_val = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation'
+val_set = TempDataset(root = root_val, raw_name= raw_name_val)
 print(len(val_set))
-print(len(train_set))
+
 
 train_dataloader = DataLoader(train_set, batch_size, shuffle=False)
 val_dataloader = DataLoader(val_set, batch_size, shuffle=False)
@@ -58,8 +59,8 @@ torch.manual_seed(0)
 
 ## SET UP MODEL
 
-initial_dim_gcn = data.num_features         #45?
-edge_dim_feature = data.num_edge_features   #11?
+initial_dim_gcn = train_set.num_features         #45?
+edge_dim_feature = train_set.num_edge_features   #11?
 
 print(initial_dim_gcn)
 print(edge_dim_feature)
@@ -211,8 +212,8 @@ data = {
         "weights_file"
     ],
     "Value": [
-        data.num_features,
-        data.num_edge_features,
+        train_set.num_features,
+        train_set.num_edge_features,
         initial_dim_gcn,
         edge_dim_feature ,
         raw_name_train,

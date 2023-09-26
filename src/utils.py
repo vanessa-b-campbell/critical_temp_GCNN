@@ -33,7 +33,7 @@ def smiles2geodata(smile, y, node_features_dict, edge_features_dict):
         stereo = int(bond.GetStereo())
         
         edge_key_features.append(f"{bond_type:.1f}_{in_ring:.1f}_{conjugated:.1f}_{stereo:.1f}") 
-    
+
     nodes_features = torch.tensor(np.array([node_features_dict[x] for x in node_keys_features]), dtype=torch.float32)
     edges_features = torch.tensor(np.array([edge_features_dict[x] for x in edge_key_features]), dtype=torch.float32)  
     
