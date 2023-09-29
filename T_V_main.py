@@ -21,28 +21,33 @@ device = device_information.device
 
 start_time = time.time()
 
-## SET UP DATALOADERS: ---
-# data = TempDataset(root = '/home/jbd3qn/Downloads/critical_temp_GCNN', raw_name = 'train_val_full.csv')
-raw_name_train = 'train_full.csv'
-root_train = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/training'
-train_set = TempDataset(root =root_train , raw_name = raw_name_train)
+root = '/home/jbd3qn/Downloads/critical_temp_GCNN'
+path = '/home/jbd3qn/Downloads/critical_temp_GCNN/train_val_full.csv'
+full_set = TempDataset(root, path)
 
-print(len(train_set))
-
-print('Number of NODES features: ', train_set.num_features)
-print('Number of EDGES features: ', train_set.num_edge_features)
+print('Number of NODES features: ', full_set.num_features)
+print('Number of EDGES features: ', full_set.num_edge_features)
 
 finish_time_preprocessing = time.time()
 time_preprocessing = (finish_time_preprocessing - finish_time_preprocessing) / 60
+## SET UP DATALOADERS: ---
+# data = TempDataset(root = '/home/jbd3qn/Downloads/critical_temp_GCNN', raw_name = 'train_val_full.csv')
+
+root_train = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/training'
+path_train = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/training/train_full.csv'
+train_set = TempDataset(root_train, path_train)
+
+print(len(train_set))
+
 
 
 # Build pytorch training and validation set dataloaders:
 batch_size = 10
 
 
-raw_name_val = 'val_full.csv'
 root_val = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation'
-val_set = TempDataset(root = root_val, raw_name= raw_name_val)
+path_val = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation/val_full.csv'
+val_set = TempDataset(root_val, path_val)
 print(len(val_set))
 
 
@@ -59,14 +64,14 @@ torch.manual_seed(0)
 
 ## SET UP MODEL
 
-initial_dim_gcn = train_set.num_features         #45?
-edge_dim_feature = train_set.num_edge_features   #11?
+initial_dim_gcn = full_set.num_features         #45
+edge_dim_feature = full_set.num_edge_features   #11
 
 print(initial_dim_gcn)
 print(edge_dim_feature)
 
 model =  GCN_Temp(initial_dim_gcn, edge_dim_feature).to(device)
-# print(x.shape)
+
 
 # Set up optimizer:
 learning_rate = 1e-3
@@ -90,14 +95,14 @@ for epoch in range(1, num_of_epochs): #TODO
     if val_loss < best_val_loss:
         best_val_loss = val_loss
         
-        torch.save(model.state_dict(), "best_model_weights_09_25.pth")
+        torch.save(model.state_dict(), "best_model_weights_09_28.pth")
 
 finish_time_training = time.time()
 time_training = finish_time_training -start_time_training
 
 
 #Testing:
-weights_file = "best_model_weights_09_25.pth"
+weights_file = "best_model_weights_09_28.pth"
 
 
 #%%
@@ -212,12 +217,12 @@ data = {
         "weights_file"
     ],
     "Value": [
-        train_set.num_features,
-        train_set.num_edge_features,
+        full_set.num_features,
+        full_set.num_edge_features,
         initial_dim_gcn,
         edge_dim_feature ,
-        raw_name_train,
-        raw_name_val,
+        path_train,
+        path_val,
         batch_size,
         learning_rate,
         num_of_epochs,

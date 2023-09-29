@@ -33,12 +33,12 @@ model =  GCN_Temp(initial_dim_gcn, edge_dim_feature).to(device)
 
 batch_size = 10
 
-weights_file = "best_model_weights_09_25.pth"
+weights_file = "best_model_weights_09_07.pth"
 
 
 ## SET UP testing DATALOADERS: ---
 raw_name ='test_full.csv'
-test_set = TempDataset(root = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv', raw_name = raw_name )
+test_set = TempDataset(root = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv', path =  '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/test_full.csv')
 print(len(test_set)) # should be 5
 
 
