@@ -13,6 +13,7 @@ import pandas as pd
 from src.process import train, validation, predict
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 from scipy.stats import pearsonr
+from src.utils import get_atom_features
 
 # device information
 device_information = device_info()
@@ -22,11 +23,14 @@ device = device_information.device
 start_time = time.time()
 
 root = '/home/jbd3qn/Downloads/critical_temp_GCNN'
-path = '/home/jbd3qn/Downloads/critical_temp_GCNN/train_val_full.csv'
-full_set = TempDataset(root, path)
+path = '/home/jbd3qn/Downloads/critical_temp_GCNN/train_val_full.csv' 
+#get smiles list - use this as an imnput into get_atom_features- import from unitls- get dictionarues out of it- now have 2 dictionaries- in data
+df = pd.read_csv(path)
+fullset_smiles_list = df[df.columns[0]].values
+features_dict_fullset, edge_features_dict_fullset = get_atom_features(fullset_smiles_list)
 
-print('Number of NODES features: ', full_set.num_features)
-print('Number of EDGES features: ', full_set.num_edge_features)
+full_set = TempDataset(root, path, features_dict_fullset, edge_features_dict_fullset)
+
 
 finish_time_preprocessing = time.time()
 time_preprocessing = (finish_time_preprocessing - finish_time_preprocessing) / 60
@@ -35,7 +39,8 @@ time_preprocessing = (finish_time_preprocessing - finish_time_preprocessing) / 6
 
 root_train = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/training'
 path_train = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/training/train_full.csv'
-train_set = TempDataset(root_train, path_train)
+# take in dictioanries as input
+train_set = TempDataset(root_train, path_train, features_dict_fullset, edge_features_dict_fullset)
 
 print(len(train_set))
 
@@ -47,10 +52,11 @@ batch_size = 10
 
 root_val = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation'
 path_val = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation/val_full.csv'
-val_set = TempDataset(root_val, path_val)
+val_set = TempDataset(root_val, path_val, features_dict_fullset, edge_features_dict_fullset)
+# take in dictioanries as input
 print(len(val_set))
 
-
+#save the dictioaries with the modle
 train_dataloader = DataLoader(train_set, batch_size, shuffle=False)
 val_dataloader = DataLoader(val_set, batch_size, shuffle=False)
 
@@ -67,8 +73,9 @@ torch.manual_seed(0)
 initial_dim_gcn = full_set.num_features         #45
 edge_dim_feature = full_set.num_edge_features   #11
 
-print(initial_dim_gcn)
-print(edge_dim_feature)
+print('Number of NODES features: ', initial_dim_gcn)
+print('Number of EDGES features: ', edge_dim_feature)
+
 
 model =  GCN_Temp(initial_dim_gcn, edge_dim_feature).to(device)
 
@@ -95,14 +102,14 @@ for epoch in range(1, num_of_epochs): #TODO
     if val_loss < best_val_loss:
         best_val_loss = val_loss
         
-        torch.save(model.state_dict(), "best_model_weights_09_28.pth")
+        torch.save(model.state_dict(), "best_model_weights_10_03.pth")
 
 finish_time_training = time.time()
 time_training = finish_time_training -start_time_training
 
 
 #Testing:
-weights_file = "best_model_weights_09_28.pth"
+weights_file = "best_model_weights_10_03.pth"
 
 
 #%%

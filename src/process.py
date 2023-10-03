@@ -42,7 +42,7 @@ def train(model, device, dataloader, optim, epoch):
     return loss_collect    
 
 def validation(model, device, dataloader, epoch):
-
+# self 
     model.eval()
     loss_collect = 0
     loss_func = torch.nn.MSELoss(reduction='sum') 
@@ -104,19 +104,19 @@ def predict(model, dataloader, device, weights_file, file_path_name):
     pred_all = torch.concat(pred_all)
 
 
-    # y_all = y_all.cpu()
-    # pred_all = pred_all.cpu()
+    y_all = y_all.cpu()
+    pred_all = pred_all.cpu()
 
-    # y_all = y_all.numpy()
-    # pred_all = pred_all.numpy()
+    y_all = y_all.numpy()
+    pred_all = pred_all.numpy()
 
-    # # creating csv file of true critical temps and predicted temps for validation
-    # df1 = pd.DataFrame(y_all)
-    # df2 = pd.DataFrame(pred_all)
+    # creating csv file of true critical temps and predicted temps for validation
+    df1 = pd.DataFrame(y_all)
+    df2 = pd.DataFrame(pred_all)
 
-    # combine_df = pd.concat([df1, df2], ignore_index=True, axis=1)
-    # combine_df.columns = ['true_temp', 'pred_temp']
-    # combine_df.to_csv(file_path_name, index=False)
+    combine_df = pd.concat([df1, df2], ignore_index=True, axis=1)
+    combine_df.columns = ['true_temp', 'pred_temp']
+    combine_df.to_csv(file_path_name, index=False)
 
 
     return X_all, y_all, pred_all

@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric.nn import  GATConv, NNConv
+from torch_geometric.nn import NNConv
 from torch_geometric.nn import aggr
 
 class GCN_Temp(torch.nn.Module):
@@ -46,9 +46,9 @@ class GCN_Temp(torch.nn.Module):
 
     def forward(self, data):
         x, edge_index, edge_attr = data.x, data.edge_index, data.edge_attr
-        print(x.shape)
-        print(edge_index.shape)
-        print(edge_attr.shape)
+        # print(x.shape)
+        # print(edge_index.shape)
+        # print(edge_attr.shape)
 
         x = self.nn_conv_1(x, edge_index, edge_attr)
         x = F.relu(x)

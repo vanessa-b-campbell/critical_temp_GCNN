@@ -10,8 +10,11 @@ from src.utils import smiles2geodata, get_atom_features
 class TempDataset(InMemoryDataset):
             
                                                                                             #no default raw_name- input when creating dataset object
-    def __init__(self, root, path, transform=None, pre_transform=None):
+    def __init__(self, root, path, features_dict, edge_features_dict, transform=None, pre_transform=None): # take in the dictionaries pulled from T_V_main.py slef.edge_feature dict 
         
+        self.features_dict = features_dict
+        self.edge_features_dict = edge_features_dict
+
         self.filename = os.path.join(path)
         #self.processed_filename = os.path.join(root,processed_name)
         
@@ -41,10 +44,10 @@ class TempDataset(InMemoryDataset):
     
     
     def process(self):
+        # comment 48 out- in datalist change self.edge features, sme.nodefeatures
+        #node_features_dict, edge_features_dict = get_atom_features(self.x)
         
-        node_features_dict, edge_features_dict = get_atom_features(self.x)
-        
-        data_list = [smiles2geodata(x,y,node_features_dict, edge_features_dict) for x,y in zip(self.x,self.y)]
+        data_list = [smiles2geodata(x,y,self.features_dict, self.edge_features_dict) for x,y in zip(self.x,self.y)]
         
         data, slices = self.collate(data_list)
         
