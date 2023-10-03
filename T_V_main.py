@@ -42,21 +42,22 @@ path_train = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/trai
 # take in dictioanries as input
 train_set = TempDataset(root_train, path_train, features_dict_fullset, edge_features_dict_fullset)
 
-print(len(train_set))
+print('length of training set: ', len(train_set))
 
 
 
-# Build pytorch training and validation set dataloaders:
-batch_size = 10
 
 
 root_val = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation'
 path_val = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation/val_full.csv'
 val_set = TempDataset(root_val, path_val, features_dict_fullset, edge_features_dict_fullset)
-# take in dictioanries as input
-print(len(val_set))
 
-#save the dictioaries with the modle
+print('length of validation set: ', len(val_set))
+
+
+# Build pytorch training and validation set dataloaders:
+batch_size = 10
+
 train_dataloader = DataLoader(train_set, batch_size, shuffle=False)
 val_dataloader = DataLoader(val_set, batch_size, shuffle=False)
 
@@ -115,24 +116,24 @@ weights_file = "best_model_weights_10_03.pth"
 #%%
 # Training:
 input_all_train, target_all_train, pred_prob_all_train = predict(model, train_dataloader, device, weights_file, 
-                                        file_path_name= '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/training_predict.csv')
+                                        file_path_name= '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/training/training_predict.csv')
 
 
 
-r2_train = r2_score(target_all_train.cpu(), pred_prob_all_train.cpu())
-mae_train = mean_absolute_error(target_all_train.cpu(), pred_prob_all_train.cpu())
-rmse_train = mean_squared_error(target_all_train.cpu(), pred_prob_all_train.cpu(), squared=False)
-r_train, _ = pearsonr(target_all_train.cpu(), pred_prob_all_train.cpu())
+r2_train = r2_score(target_all_train, pred_prob_all_train)
+mae_train = mean_absolute_error(target_all_train, pred_prob_all_train)
+rmse_train = mean_squared_error(target_all_train, pred_prob_all_train, squared=False)
+r_train, _ = pearsonr(target_all_train, pred_prob_all_train)
 
 # Validation:
 
 input_all_val, target_all_val, pred_prob_all_val = predict(model, val_dataloader, device, weights_file,
                                         file_path_name = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation/val_predict.csv' )
 
-r2_val = r2_score(target_all_val.cpu(), pred_prob_all_val.cpu())
-mae_val = mean_absolute_error(target_all_val.cpu(), pred_prob_all_val.cpu())
-rmse_val = mean_squared_error(target_all_val.cpu(), pred_prob_all_val.cpu(), squared=False)
-r_val, _ = pearsonr(target_all_val.cpu(), pred_prob_all_val.cpu())
+r2_val = r2_score(target_all_val, pred_prob_all_val)
+mae_val = mean_absolute_error(target_all_val, pred_prob_all_val)
+rmse_val = mean_squared_error(target_all_val, pred_prob_all_val, squared=False)
+r_val, _ = pearsonr(target_all_val, pred_prob_all_val)
 
 
 ######## plots
@@ -156,10 +157,10 @@ legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".f
 )
 
 plt.figure(figsize=(4, 4), dpi=100)
-plt.scatter(target_all_train.cpu(), pred_prob_all_train.cpu(), alpha=0.3)
-plt.plot([min(target_all_train.cpu()), max(target_all_train.cpu())], [min(target_all_train.cpu()),
-                                                            max(target_all_train.cpu())], color="k", ls="--")
-plt.xlim([min(target_all_train.cpu()), max(target_all_train.cpu())])
+plt.scatter(target_all_train, pred_prob_all_train, alpha=0.3)
+plt.plot([min(target_all_train), max(target_all_train)], [min(target_all_train),
+                                                            max(target_all_train)], color="k", ls="--")
+plt.xlim([min(target_all_train), max(target_all_train)])
 plt.title('Training')
 plt.xlabel("True Values")
 plt.ylabel("Predicted Values")
@@ -173,10 +174,10 @@ legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".f
 )
 
 plt.figure(figsize=(4, 4), dpi=100)
-plt.scatter(target_all_val.cpu(), pred_prob_all_val.cpu(), alpha=0.3)
-plt.plot([min(target_all_val.cpu()), max(target_all_val.cpu())], [min(target_all_val.cpu()),
-        max(target_all_val.cpu())], color="k", ls="--")
-plt.xlim([min(target_all_val.cpu()), max(target_all_val.cpu())])
+plt.scatter(target_all_val, pred_prob_all_val, alpha=0.3)
+plt.plot([min(target_all_val), max(target_all_val)], [min(target_all_val),
+        max(target_all_val)], color="k", ls="--")
+plt.xlim([min(target_all_val), max(target_all_val)])
 plt.title('Validation')
 plt.xlabel("True Values")
 plt.ylabel("Predicted Values")
