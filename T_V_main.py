@@ -37,7 +37,7 @@ start_time = time.time()
 
 # full set path and root for features/edge dictionaries
 root = '/home/jbd3qn/Downloads/critical_temp_GCNN'
-path = '/home/jbd3qn/Downloads/critical_temp_GCNN/train_val_full.csv' 
+path = '/home/jbd3qn/Downloads/critical_temp_GCNN/train_val_test_full.csv' 
 
 # Read in smiles list from full set
 df = pd.read_csv(path)
@@ -71,6 +71,14 @@ val_set = TempDataset(root_val, path_val, features_dict_fullset, edge_features_d
 
 print('length of validation set: ', len(val_set))
 
+# # # # # # # # # # # # # # # # # Testing # # # # # # # # # # # # # # # # # # # # # # # #
+
+## SET UP testing DATALOADERS: ---
+root_test = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing'
+path_test = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/test_full.csv'
+test_set = TempDataset(root_test, path_test, features_dict_fullset, edge_features_dict_fullset)
+
+print('length of testing set: ', len(test_set)) # should be 116
 
 
 # Build pytorch training and validation set dataloaders:
@@ -271,10 +279,10 @@ data = {
 
 df = pd.DataFrame(data)
 
-path = '/home/jbd3qn/Downloads/critical_temp_GCNN/results'
+path_1 = '/home/jbd3qn/Downloads/critical_temp_GCNN/results'
 
 
-filename = os.path.join(root,results_file)
+filename = os.path.join(path_1,results_file)
 df.to_csv(filename, index=False)
 
 
@@ -283,19 +291,10 @@ df.to_csv(filename, index=False)
 #%%
 # # # # # # # # # # # # # # # # # Testing # # # # # # # # # # # # # # # # # # # # # # # #
 
-## SET UP testing DATALOADERS: ---
-root = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv'
-path =  '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/test_full.csv'
-test_set = TempDataset(root, path, features_dict_fullset, edge_features_dict_fullset)
-
-print('length of testing set: ', len(test_set)) # should be 116
-
 test_dataloader = DataLoader(test_set, batch_size, shuffle=False)
 
 
 input_all_test, target_all_test, pred_prob_all_test = predict(model, test_dataloader, device, weights_file, test_predict_file_path_name)
-
-print(target_all_test)
 
 
 r2_test = r2_score(target_all_test, pred_prob_all_test)
@@ -340,6 +339,8 @@ test_data = {
         edge_dim_feature,
         path,
         batch_size,
+        learning_rate,
+        num_of_epochs,
         r2_test, 
         r_test, 
         mae_test, 
@@ -350,9 +351,9 @@ test_data = {
 }
 
 
-df = pd.DataFrame(test_data)
-path = '/home/jbd3qn/Downloads/critical_temp_GCNN/results'
+df_2 = pd.DataFrame(test_data)
+path_2 = '/home/jbd3qn/Downloads/critical_temp_GCNN/results'
 
-
-filename = os.path.join(root,test_results_file)
-df.to_csv(filename,  index=False)
+# name of test_results_file is at the beginnning of file
+filename_2 = os.path.join(path_2,test_results_file)
+df_2.to_csv(filename_2,  index=False)

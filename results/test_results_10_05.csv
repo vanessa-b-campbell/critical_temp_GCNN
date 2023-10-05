@@ -1,0 +1,12 @@
+Metric,Value
+initial_dim_gcn ,45
+edge_dim_feature,11
+testing split ,/home/jbd3qn/Downloads/critical_temp_GCNN/train_val_test_full.csv
+batch_size,10
+learning_rate,0.001
+number_of_epochs,100
+r2_test,0.8187953485655057
+r_test,0.9190561583598392
+mae_test,36.3250093829977
+rmse_test,52.58084134233579
+weights_file,best_model_weights_10_05.pth
