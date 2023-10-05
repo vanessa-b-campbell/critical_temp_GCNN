@@ -15,14 +15,17 @@ from scipy.stats import pearsonr
 from src.utils import get_atom_features
 import os
 
-
-# # # # # # # # # # # # # # # # # # update date before running
-results_file = 'T_V_results_10_05.csv'
-test_results_file = 'test_results_10_05.csv'
+# FIRST- BEFORE RUNNING!!!!!!
+# 1. delete all processed files in ../chemprop_splits_csv
+# 2. update dates on filenames
+results_file = 'T_V_results_10_05.csv'                      #saved in ../results file
+test_results_file = 'test_results_10_05.csv'                #saved in ../results file
 model_weights_name = "best_model_weights_10_05.pth"
-train_predict_file_path_name= '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/training/training_predict_10_05.csv'
-val_predict_file_path_name = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation/val_predict_10_05.csv' 
-test_predict_file_path_name = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/test_predict_10_05.csv'
+
+# change so that only the name is at the top- add os combine filename + root thingy
+train_predict_file_path_name= '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/training/training_predict_10_05.csv'      #saved in ../chemprop_splits_csv/training
+val_predict_file_path_name = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation/val_predict_10_05.csv'          #saved in ../chemprop_splits_csv/validation
+test_predict_file_path_name = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/test_predict_10_05.csv'           #saved in ../chemprop_splits_csv/Testing
 
 
 # device information
