@@ -1,5 +1,4 @@
 #%%
-
 # # # # # # # # # #  replaces main.py # # # # # # # # # # # 
 import time
 import matplotlib.pyplot as plt
@@ -14,6 +13,16 @@ from src.process import train, validation, predict
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 from scipy.stats import pearsonr
 from src.utils import get_atom_features
+import os
+
+
+# # # # # # # # # # # # # # # # # # update date before running
+results_file = 'T_V_results10_05.csv'
+test_results_file = 'test_results10_05.csv'
+model_weights_name = "best_model_weights_10_05.pth"
+
+
+
 
 # device information
 device_information = device_info()
@@ -22,37 +31,42 @@ device = device_information.device
 
 start_time = time.time()
 
+# full set path and root for features/edge dictionaries
 root = '/home/jbd3qn/Downloads/critical_temp_GCNN'
 path = '/home/jbd3qn/Downloads/critical_temp_GCNN/train_val_full.csv' 
-#get smiles list - use this as an imnput into get_atom_features- import from unitls- get dictionarues out of it- now have 2 dictionaries- in data
+
+# Read in smiles list from full set
 df = pd.read_csv(path)
 fullset_smiles_list = df[df.columns[0]].values
+
+# use get_atoms_features from utils.py to get features/edge dictionaries from full_set
 features_dict_fullset, edge_features_dict_fullset = get_atom_features(fullset_smiles_list)
 
 full_set = TempDataset(root, path, features_dict_fullset, edge_features_dict_fullset)
-
+# making full set into a TempDataset object to use as initial_dim_gcn and edge_dim_feature for 
+# model parameters
 
 finish_time_preprocessing = time.time()
 time_preprocessing = (finish_time_preprocessing - finish_time_preprocessing) / 60
-## SET UP DATALOADERS: ---
-# data = TempDataset(root = '/home/jbd3qn/Downloads/critical_temp_GCNN', raw_name = 'train_val_full.csv')
 
+
+## SET UP DATALOADERS: ---
+
+# Training set
 root_train = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/training'
 path_train = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/training/train_full.csv'
-# take in dictioanries as input
 train_set = TempDataset(root_train, path_train, features_dict_fullset, edge_features_dict_fullset)
 
 print('length of training set: ', len(train_set))
 
 
-
-
-
+# Validatiion set
 root_val = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation'
 path_val = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation/val_full.csv'
 val_set = TempDataset(root_val, path_val, features_dict_fullset, edge_features_dict_fullset)
 
 print('length of validation set: ', len(val_set))
+
 
 
 # Build pytorch training and validation set dataloaders:
@@ -71,6 +85,7 @@ torch.manual_seed(0)
 
 ## SET UP MODEL
 
+# using full set to get number of features/ number of edge festures
 initial_dim_gcn = full_set.num_features         #45
 edge_dim_feature = full_set.num_edge_features   #11
 
@@ -103,14 +118,15 @@ for epoch in range(1, num_of_epochs): #TODO
     if val_loss < best_val_loss:
         best_val_loss = val_loss
         
-        torch.save(model.state_dict(), "best_model_weights_10_03.pth")
+        torch.save(model.state_dict(), model_weights_name)
+
 
 finish_time_training = time.time()
 time_training = finish_time_training -start_time_training
 
 
 #Testing:
-weights_file = "best_model_weights_10_03.pth"
+weights_file = model_weights_name
 
 
 #%%
@@ -252,46 +268,89 @@ data = {
 }
 
 df = pd.DataFrame(data)
-df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/results.csv', index=False)
+
+path = '/home/jbd3qn/Downloads/critical_temp_GCNN/results'
 
 
-# # for validation
-# target_all_val = target_all_val.cpu()
-# pred_prob_all_val = pred_prob_all_val.cpu()
-
-# target_all_val = target_all_val.numpy()
-# pred_prob_all_val = pred_prob_all_val.numpy()
-
-# # creating csv file of true critical temps and predicted temps for validation
-# df3 = pd.DataFrame(target_all_val)
-# df4 = pd.DataFrame(pred_prob_all_val)
-
-# combined_df_1 = pd.concat([df3, df4], ignore_index=True, axis=1)
-# combined_df_1.columns = ['critical_temp_val', 'predicted_temp_val']
-# combined_df_1.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp_val.csv', index=False)
+filename = os.path.join(root,results_file)
+df.to_csv(filename, index=False)
 
 
 
-# # for training
-# target_all_train = target_all_train.cpu()
-# pred_prob_all_train = pred_prob_all_train.cpu()
 
-# target_all_train = target_all_train.numpy()
-# pred_prob_all_train = pred_prob_all_train.numpy()
+#%%
+# # # # # # # # # # # # # # # # # Testing # # # # # # # # # # # # # # # # # # # # # # # #
 
-# # creating a csv file of the true critical temps entering the model and true critical temps exiting the model
-# # further comparison analysis in matching_in_out.py
-# df = pd.DataFrame(target_all_train)
-# dfa = pd.DataFrame(train_set.y)
-# combine_df = pd.concat([dfa, df], ignore_index=True, axis=1)
-# combine_df.columns = ['Pre_model_true_temp', 'post_model_true_temp']
-# combine_df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/train_pre_post_critical_T.csv', index=False)
+## SET UP testing DATALOADERS: ---
+root = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv'
+path =  '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/test_full.csv'
+test_set = TempDataset(root, path, features_dict_fullset, edge_features_dict_fullset)
+
+print('length of testing set: ', len(test_set)) # should be 116
+
+test_dataloader = DataLoader(test_set, batch_size, shuffle=False)
+
+file_path_name = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/test_predict.csv'
+input_all_test, target_all_test, pred_prob_all_test = predict(model, test_dataloader, device, weights_file, file_path_name)
+
+print(target_all_test)
 
 
-# # creating csv file of true critical temps and predicted temps for training
-# df1 = pd.DataFrame(target_all_train)
-# df2 = pd.DataFrame(pred_prob_all_train)
+r2_test = r2_score(target_all_test, pred_prob_all_test)
+mae_test = mean_absolute_error(target_all_test, pred_prob_all_test)
+rmse_test = mean_squared_error(target_all_test, pred_prob_all_test, squared=False)
+r_test, _ = pearsonr(target_all_test, pred_prob_all_test)
 
-# combined_df = pd.concat([df1, df2], ignore_index=True, axis=1)
-# combined_df.columns = ['critical_temp_train', 'predicted_temp_train']
-# combined_df.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp_training.csv', index=False)
+#testing stats
+legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".format(
+    r2_test, r_test , mae_test, rmse_test
+)
+
+plt.figure(figsize=(4, 4), dpi=100)
+plt.scatter(target_all_test, pred_prob_all_test, alpha=0.3)
+plt.plot([min(target_all_test), max(target_all_test)], [min(target_all_test),
+                                                            max(target_all_test)], color="k", ls="--")
+plt.xlim([min(target_all_test), max(target_all_test)])
+plt.title('Testing')
+plt.xlabel("True Values")
+plt.ylabel("Predicted Values")
+plt.legend([legend_text], loc="lower right")
+plt.show()
+
+
+
+test_data = {
+    "Metric": [
+        "initial_dim_gcn ",
+        "edge_dim_feature",
+        "testing split ",
+        "batch_size", 
+        "learning_rate",
+        "number_of_epochs",
+        "r2_test",
+        "r_test",
+        "mae_test",
+        "rmse_test", 
+        "weights_file"
+    ],
+    "Value": [
+        initial_dim_gcn,
+        edge_dim_feature,
+        path,
+        batch_size,
+        r2_test, 
+        r_test, 
+        mae_test, 
+        rmse_test,
+        weights_file
+    ],
+    
+}
+
+
+df = pd.DataFrame(test_data)
+path = '/home/jbd3qn/Downloads/critical_temp_GCNN/results'
+
+
+filename = os.path.join(root,test_results_file)
+df.to_csv(filename,  index=False)
