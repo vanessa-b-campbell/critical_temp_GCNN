@@ -17,11 +17,12 @@ import os
 
 
 # # # # # # # # # # # # # # # # # # update date before running
-results_file = 'T_V_results10_05.csv'
-test_results_file = 'test_results10_05.csv'
+results_file = 'T_V_results_10_05.csv'
+test_results_file = 'test_results_10_05.csv'
 model_weights_name = "best_model_weights_10_05.pth"
-
-
+train_predict_file_path_name= '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/training/training_predict_10_05.csv'
+val_predict_file_path_name = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation/val_predict_10_05.csv' 
+test_predict_file_path_name = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/test_predict_10_05.csv'
 
 
 # device information
@@ -131,8 +132,7 @@ weights_file = model_weights_name
 
 #%%
 # Training:
-input_all_train, target_all_train, pred_prob_all_train = predict(model, train_dataloader, device, weights_file, 
-                                        file_path_name= '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/training/training_predict.csv')
+input_all_train, target_all_train, pred_prob_all_train = predict(model, train_dataloader, device, weights_file, train_predict_file_path_name)
 
 
 
@@ -143,8 +143,7 @@ r_train, _ = pearsonr(target_all_train, pred_prob_all_train)
 
 # Validation:
 
-input_all_val, target_all_val, pred_prob_all_val = predict(model, val_dataloader, device, weights_file,
-                                        file_path_name = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation/val_predict.csv' )
+input_all_val, target_all_val, pred_prob_all_val = predict(model, val_dataloader, device, weights_file, val_predict_file_path_name )
 
 r2_val = r2_score(target_all_val, pred_prob_all_val)
 mae_val = mean_absolute_error(target_all_val, pred_prob_all_val)
@@ -290,8 +289,8 @@ print('length of testing set: ', len(test_set)) # should be 116
 
 test_dataloader = DataLoader(test_set, batch_size, shuffle=False)
 
-file_path_name = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/test_predict.csv'
-input_all_test, target_all_test, pred_prob_all_test = predict(model, test_dataloader, device, weights_file, file_path_name)
+
+input_all_test, target_all_test, pred_prob_all_test = predict(model, test_dataloader, device, weights_file, test_predict_file_path_name)
 
 print(target_all_test)
 
