@@ -1,43 +1,52 @@
 import pandas as pd
 
+
 ###### bring in the testing data
-# testing_data = pd.read_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/predicted_temp_test.csv')
-testing_data = pd.read_csv('C:\\Users\\color\\Documents\\Bilodeau_Research_Python\\Critical_Temp_Research\\GCNN_branch_2\\critical_temp_GCNN\\predicted_temp_test.csv')
-smiles = testing_data.iloc[:,0].tolist()
-temp_column = testing_data.iloc[:,1].tolist()
-predict_column = testing_data.iloc[:,2].tolist()
+predict_test_data = pd.read_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/test_predict_10_05.csv')
+
+og_test_data = pd.read_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/test_full.csv')
+
+smiles = og_test_data.iloc[:,0].tolist()
+temp_column = og_test_data.iloc[:,1].tolist()
+predict_column = predict_test_data.iloc[:,1].tolist()
 test_list_GCNN = list(zip(smiles, temp_column, predict_column))
 
-###### bring in the validation data
-val_data = pd.read_csv('C:\\Users\\color\\Documents\\Bilodeau_Research_Python\\Critical_Temp_Research\\GCNN_branch_2\\critical_temp_GCNN\\predicted_temp_val.csv')
-# smiles = val_data.iloc[:,0].tolist()
-temp_column_val = val_data.iloc[:,0].tolist()
-predict_column_val = val_data.iloc[:,1].tolist()
-val_list_GCNN = list(zip(temp_column_val, predict_column_val))
+
+
+test_GCNN = pd.DataFrame(test_list_GCNN)
+test_GCNN.columns = ['SMILES', 'critical_temp', 'predict_temp']
+
+test_GCNN.to_csv('/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/SmiCriPre_test_full.csv', index=False)
 
 
 
-
-
-mol_val = []
-for index in range(0,len(val_list_GCNN)):
-    if val_list_GCNN[index][1] <= 250:
-        mol_val.append(val_list_GCNN[index])
+bad_mols = []
+for index in range(0,len(test_list_GCNN)):
+    diff = abs(test_list_GCNN[index][1] - test_list_GCNN[index][2])
+    if diff >= 100:
+        bad_mols.append(test_list_GCNN[index][:])
     
-    
-mol_test = []
-for index in range(0,len(test_list_GCNN)):    
-    if  test_list_GCNN[index][2] <= 250:
-        mol_test.append(test_list_GCNN[index])
-
-
-print("from validation")
-for each in mol_val:
+print('bad mols from testing split:')
+for each in bad_mols:
     print(each)
     
-print('\n from testing')
-for each in mol_test:
-    print(each)
+    
+# for index in range(0,len(bad_mols)):  
+#     mol = Chem.MolFromSmiles(bad_mols[index][0])
+#     img = Draw.MolToImage(mol)
+#     print(img.show())
+    
+    
+# mol_test = []
+# for index in range(0,len(test_list_GCNN)):    
+#     if  test_list_GCNN[index][2] <= 250:
+#         mol_test.append(test_list_GCNN[index])
+
+
+# print("from validation")
+# for each in mol_val:
+#     print(each)
+    
     
     
     
