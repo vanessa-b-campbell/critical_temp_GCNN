@@ -14,19 +14,14 @@ from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 from scipy.stats import pearsonr
 from src.utils import get_atom_features
 import os
+import csv
 
 # FIRST- BEFORE RUNNING!!!!!!
 # 1. delete all processed files in ../chemprop_splits_csv
-# 2. update dates on filenames
-results_file = 'T_V_results_10_05.csv'                      #saved in ../results file
-test_results_file = 'test_results_10_05.csv'                #saved in ../results file
-model_weights_name = "best_model_weights_10_05.pth"
+# 2. update dates on model folder
 
-# change so that only the name is at the top- add os combine filename + root thingy
-train_predict_file_path_name= '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/training/training_predict_10_05.csv'      #saved in ../chemprop_splits_csv/training
-val_predict_file_path_name = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation/val_predict_10_05.csv'          #saved in ../chemprop_splits_csv/validation
-test_predict_file_path_name = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/test_predict_10_05.csv'           #saved in ../chemprop_splits_csv/Testing
-
+model_folder = './model_10_10/'
+os.makedirs(model_folder)
 
 # device information
 device_information = device_info()
@@ -46,9 +41,36 @@ fullset_smiles_list = df[df.columns[0]].values
 # use get_atoms_features from utils.py to get features/edge dictionaries from full_set
 features_dict_fullset, edge_features_dict_fullset = get_atom_features(fullset_smiles_list)
 
-full_set = TempDataset(root, path, features_dict_fullset, edge_features_dict_fullset)
+# save dictionaries as csvs
+feat_dict_name = 'features_dict.csv'
+model_f_dict_path = os.path.join(model_folder + feat_dict_name)
+
+edge_dict_name = 'edge_features_dict.csv'
+model_e_dict_path = os.path.join(model_folder + edge_dict_name)
+
+with open(model_f_dict_path, 'w', newline='') as file:
+    writer = csv.writer(file)
+    header = features_dict_fullset.keys()
+    writer.writerow(header)
+    for row in zip(*features_dict_fullset.values()):
+        writer.writerow(row)
+file.close()
+
+with open(model_e_dict_path, 'w', newline='') as file:
+    writer = csv.writer(file)
+    header = edge_features_dict_fullset.keys()
+    writer.writerow(header)
+    for row in zip(*edge_features_dict_fullset.values()):
+        writer.writerow(row)
+file.close()
+
+#features_dict_fullset = csv.DictWriter(model_f_dict_path, features_dict_fullset.keys())
+#edge_features_dict_fullset = csv.DictWriter(model_e_dict_path, edge_features_dict_fullset.keys())
+
+
 # making full set into a TempDataset object to use as initial_dim_gcn and edge_dim_feature for 
 # model parameters
+full_set = TempDataset(root, path, features_dict_fullset, edge_features_dict_fullset)
 
 finish_time_preprocessing = time.time()
 time_preprocessing = (finish_time_preprocessing - finish_time_preprocessing) / 60
@@ -107,6 +129,9 @@ print('Number of EDGES features: ', edge_dim_feature)
 
 model =  GCN_Temp(initial_dim_gcn, edge_dim_feature).to(device)
 
+model_weights_name = "best_model_weights.pth"
+model_weights_path = os.path.join(model_folder + model_weights_name)
+
 
 # Set up optimizer:
 learning_rate = 1e-3
@@ -130,7 +155,7 @@ for epoch in range(1, num_of_epochs): #TODO
     if val_loss < best_val_loss:
         best_val_loss = val_loss
         
-        torch.save(model.state_dict(), model_weights_name)
+        torch.save(model.state_dict(), model_weights_path)
 
 
 finish_time_training = time.time()
@@ -138,11 +163,14 @@ time_training = finish_time_training -start_time_training
 
 
 #Testing:
-weights_file = model_weights_name
+weights_file = model_weights_path
 
 
 #%%
 # Training:
+train_predict_file = 'train_predict.csv' 
+train_predict_file_path_name= os.path.join(model_folder + train_predict_file)
+
 input_all_train, target_all_train, pred_prob_all_train = predict(model, train_dataloader, device, weights_file, train_predict_file_path_name)
 
 
@@ -153,6 +181,8 @@ rmse_train = mean_squared_error(target_all_train, pred_prob_all_train, squared=F
 r_train, _ = pearsonr(target_all_train, pred_prob_all_train)
 
 # Validation:
+val_predict_file = 'val_predict.csv'
+val_predict_file_path_name = os.path.join(model_folder + val_predict_file)
 
 input_all_val, target_all_val, pred_prob_all_val = predict(model, val_dataloader, device, weights_file, val_predict_file_path_name )
 
@@ -173,6 +203,7 @@ plt.plot(val_losses, label='Validation losses')
 plt.legend()
 plt.xlabel('Time')
 plt.ylabel('Losses')
+plt.savefig(os.path.join(model_folder + 'train_val_loss.png'))
 plt.show()
 
 
@@ -191,6 +222,7 @@ plt.title('Training')
 plt.xlabel("True Values")
 plt.ylabel("Predicted Values")
 plt.legend([legend_text], loc="lower right")
+plt.savefig(os.path.join(model_folder + 'train_parody.png'))
 plt.show()
 
 
@@ -208,6 +240,7 @@ plt.title('Validation')
 plt.xlabel("True Values")
 plt.ylabel("Predicted Values")
 plt.legend([legend_text], loc="lower right")
+plt.savefig(os.path.join(model_folder + 'val_parody.png'))
 plt.show()
 
 
@@ -279,11 +312,10 @@ data = {
 
 df = pd.DataFrame(data)
 
-path_1 = '/home/jbd3qn/Downloads/critical_temp_GCNN/results'
+results_file_name = 'T_V_results.csv'   
+results_file = os.path.join(model_folder + results_file_name)
 
-
-filename = os.path.join(path_1,results_file)
-df.to_csv(filename, index=False)
+df.to_csv(results_file, index=False)
 
 
 
@@ -293,6 +325,8 @@ df.to_csv(filename, index=False)
 
 test_dataloader = DataLoader(test_set, batch_size, shuffle=False)
 
+test_predict_file = 'test_predict.csv'
+test_predict_file_path_name = os.path.join(model_folder + test_predict_file)
 
 input_all_test, target_all_test, pred_prob_all_test = predict(model, test_dataloader, device, weights_file, test_predict_file_path_name)
 
@@ -316,6 +350,7 @@ plt.title('Testing')
 plt.xlabel("True Values")
 plt.ylabel("Predicted Values")
 plt.legend([legend_text], loc="lower right")
+plt.savefig(os.path.join(model_folder + 'test_parody.png'))
 plt.show()
 
 
@@ -337,7 +372,7 @@ test_data = {
     "Value": [
         initial_dim_gcn,
         edge_dim_feature,
-        path,
+        path_test,
         batch_size,
         learning_rate,
         num_of_epochs,
@@ -352,8 +387,10 @@ test_data = {
 
 
 df_2 = pd.DataFrame(test_data)
-path_2 = '/home/jbd3qn/Downloads/critical_temp_GCNN/results'
+
+test_results_file_name = 'test_results.csv'         
+test_results_file = os.path.join(model_folder + test_results_file_name)
+
 
 # name of test_results_file is at the beginnning of file
-filename_2 = os.path.join(path_2,test_results_file)
-df_2.to_csv(filename_2,  index=False)
+df_2.to_csv(test_results_file,  index=False)
