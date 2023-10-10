@@ -20,7 +20,7 @@ import csv
 # 1. delete all processed files in ../chemprop_splits_csv
 # 2. update dates on model folder
 
-model_folder = './model_10_10/'
+model_folder = './model_10_10_loops/'
 os.makedirs(model_folder)
 
 # device information
@@ -104,10 +104,6 @@ print('length of testing set: ', len(test_set)) # should be 116
 
 
 # Build pytorch training and validation set dataloaders:
-batch_size = 10
-
-train_dataloader = DataLoader(train_set, batch_size, shuffle=False)
-val_dataloader = DataLoader(val_set, batch_size, shuffle=False)
 
 
 
@@ -132,64 +128,88 @@ model =  GCN_Temp(initial_dim_gcn, edge_dim_feature).to(device)
 model_weights_name = "best_model_weights.pth"
 model_weights_path = os.path.join(model_folder + model_weights_name)
 
-
-# Set up optimizer:
-learning_rate = 1e-3
-optimizer = optim.Adam(model.parameters(), learning_rate)
-
-train_losses = []
-val_losses = []
-
-best_val_loss = float('inf')  # infinite
-
-start_time_training = time.time()
-num_of_epochs = 100
-for epoch in range(1, num_of_epochs): #TODO
-
-    train_loss = train(model, device, train_dataloader, optimizer, epoch)
-    train_losses.append(train_loss)
-
-    val_loss = validation(model, device, val_dataloader, epoch)
-    val_losses.append(val_loss)
-    
-    if val_loss < best_val_loss:
-        best_val_loss = val_loss
-        
-        torch.save(model.state_dict(), model_weights_path)
-
-
-finish_time_training = time.time()
-time_training = finish_time_training -start_time_training
-
-
-#Testing:
-weights_file = model_weights_path
-
-
-#%%
-# Training:
-train_predict_file = 'train_predict.csv' 
-train_predict_file_path_name= os.path.join(model_folder + train_predict_file)
-
-input_all_train, target_all_train, pred_prob_all_train = predict(model, train_dataloader, device, weights_file, train_predict_file_path_name)
+########################################################################################################
 
 
 
-r2_train = r2_score(target_all_train, pred_prob_all_train)
-mae_train = mean_absolute_error(target_all_train, pred_prob_all_train)
-rmse_train = mean_squared_error(target_all_train, pred_prob_all_train, squared=False)
-r_train, _ = pearsonr(target_all_train, pred_prob_all_train)
 
-# Validation:
-val_predict_file = 'val_predict.csv'
-val_predict_file_path_name = os.path.join(model_folder + val_predict_file)
+best_num_of_epochs = 100
+best_learning_rate = 0
+best_batch_size = 10
+big_r_squared = 0
 
-input_all_val, target_all_val, pred_prob_all_val = predict(model, val_dataloader, device, weights_file, val_predict_file_path_name )
 
-r2_val = r2_score(target_all_val, pred_prob_all_val)
-mae_val = mean_absolute_error(target_all_val, pred_prob_all_val)
-rmse_val = mean_squared_error(target_all_val, pred_prob_all_val, squared=False)
-r_val, _ = pearsonr(target_all_val, pred_prob_all_val)
+for batch_size in range(2, 18, 8):
+    for num_of_epochs in range(100, 500, 100):
+        learn_range = (x * 0.0001 for x in range(1, 10, 9))
+        for learning_rate in learn_range:
+
+
+            # Set up optimizer:
+
+            train_dataloader = DataLoader(train_set, batch_size, shuffle=False)
+            val_dataloader = DataLoader(val_set, batch_size, shuffle=False)
+
+            optimizer = optim.Adam(model.parameters(), learning_rate)
+
+            train_losses = []
+            val_losses = []
+
+            best_val_loss = float('inf')  # infinite
+
+            start_time_training = time.time()
+            for epoch in range(1, num_of_epochs): #TODO
+
+                train_loss = train(model, device, train_dataloader, optimizer, epoch)
+                train_losses.append(train_loss)
+
+                val_loss = validation(model, device, val_dataloader, epoch)
+                val_losses.append(val_loss)
+                
+                if val_loss < best_val_loss:
+                    best_val_loss = val_loss
+                    
+                    torch.save(model.state_dict(), model_weights_path)
+
+
+            finish_time_training = time.time()
+            time_training = finish_time_training -start_time_training
+
+
+            #Testing:
+            weights_file = model_weights_path
+
+
+            #%%
+            # Training:
+            train_predict_file = 'train_predict.csv' 
+            train_predict_file_path_name= os.path.join(model_folder + train_predict_file)
+
+            input_all_train, target_all_train, pred_prob_all_train = predict(model, train_dataloader, device, weights_file, train_predict_file_path_name)
+
+            r2_train = r2_score(target_all_train, pred_prob_all_train)
+
+            if r2_train > big_r_squared: 
+                big_r_squared = r2_train
+                best_num_of_epochs = num_of_epochs
+                best_learning_rate = learning_rate
+                best_batch_size = batch_size
+
+
+            mae_train = mean_absolute_error(target_all_train, pred_prob_all_train)
+            rmse_train = mean_squared_error(target_all_train, pred_prob_all_train, squared=False)
+            r_train, _ = pearsonr(target_all_train, pred_prob_all_train)
+
+            # Validation:
+            val_predict_file = 'val_predict.csv'
+            val_predict_file_path_name = os.path.join(model_folder + val_predict_file)
+
+            input_all_val, target_all_val, pred_prob_all_val = predict(model, val_dataloader, device, weights_file, val_predict_file_path_name )
+
+            r2_val = r2_score(target_all_val, pred_prob_all_val)
+            mae_val = mean_absolute_error(target_all_val, pred_prob_all_val)
+            rmse_val = mean_squared_error(target_all_val, pred_prob_all_val, squared=False)
+            r_val, _ = pearsonr(target_all_val, pred_prob_all_val)
 
 
 ######## plots

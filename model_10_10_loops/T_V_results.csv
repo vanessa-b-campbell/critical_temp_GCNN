@@ -1,0 +1,23 @@
+Metric,Value
+number_features,45
+num_edge_features,11
+initial_dim_gcn ,45
+edge_dim_feature,11
+training split ,/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/training/train_full.csv
+validation split ,/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/validation/val_full.csv
+batch_size,10
+learning_rate,0.0001
+number_of_epochs,400
+r2_train,0.9103471447453946
+r_train,0.9890809899927234
+mae_train,37.38935094792286
+rmse_train,43.00058818755656
+r2_validation,0.8378828423308705
+r_validation,0.9514992363214831
+mae_validation,43.63133548386948
+rmse_validation,57.61133328816147
+time_preprocessing,0.0
+time_training,276.44317293167114
+time_prediction,0.5114096721013387
+total_time,48.107804425557454
+weights_file,./model_10_10_loops/best_model_weights.pth
