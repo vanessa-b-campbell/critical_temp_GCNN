@@ -22,7 +22,7 @@ from math import sqrt
 # 1. delete all processed files in ../chemprop_splits_csv
 # 2. update dates on model folder
 
-model_folder = './model_10_12_II/'
+model_folder = './model_10_12_delete/'
 os.makedirs(model_folder)
 # write something here that will overwrite an existing file with the same name? 
 # maybe make accident prone somehow? 
@@ -127,19 +127,28 @@ edge_dim_feature = full_set.num_edge_features   #11
 print('Number of NODES features: ', initial_dim_gcn)
 print('Number of EDGES features: ', edge_dim_feature)
 
+# hidden_dim_nn_1=500
+# p1 = 0.5 
+# hidden_dim_nn_2=500
+# p2 = 0 
+# hidden_dim_nn_3=100
+# p3 = 0
+
+# hidden_dim_fcn_1=100
+# hidden_dim_fcn_2=50
+# hidden_dim_fcn_3=5
+
+## default
 hidden_dim_nn_1=2000
-p1 = 0.5 #drop out prob. for each layer
+p1 = 0.5 
 hidden_dim_nn_2=500
-p2 = 0.4 
+p2 = 0.4
 hidden_dim_nn_3=100
-p3 = 0.3 
+p3 = 0.3
 
 hidden_dim_fcn_1=1000
 hidden_dim_fcn_2=100
-hidden_dim_fcn_3=5
-
-
-
+hidden_dim_fcn_3=50
 
 model =  GCN_Temp(initial_dim_gcn, edge_dim_feature,
                 hidden_dim_nn_1, 
@@ -159,7 +168,7 @@ model_weights_path = os.path.join(model_folder + model_weights_name)
 
 
 num_of_epochs = 100
-learning_rate = 0.001
+learning_rate = 0.0001
 batch_size = 10
 
 # Set up optimizer:
@@ -288,11 +297,22 @@ print("\n //// Training time: {:3f} minutes ////".format(time_training))
 print("\n //// Prediction time: {:3f} minutes ////".format(time_prediction))
 print("\n //// Total time: {:3f} minutes ////".format(total_time))
 #results DataFrame
+layers = ''
 
-if hidden_dim_nn_1 == 2000 and p1 == 0.5 and hidden_dim_nn_2==500 and p2 == 0.4 and hidden_dim_nn_3==100 and p3 == 0.3 and hidden_dim_fcn_1==1000 and hidden_dim_fcn_2==100 and hidden_dim_fcn_3==5:
-    layers = 'deafult'
+if (hidden_dim_nn_1 == 2000 and p1 == 0.5 and 
+    hidden_dim_nn_2==500 and p2 == 0.4 and 
+    hidden_dim_nn_3==100 and p3 == 0.3 and 
+    hidden_dim_fcn_1==1000 and hidden_dim_fcn_2==100 and 
+    hidden_dim_fcn_3==50):
+    
+    layers = 'default'
 else: 
-    layers = (hidden_dim_nn_1, p1, hidden_dim_nn_2, p2, hidden_dim_nn_3, p3, hidden_dim_fcn_1, hidden_dim_fcn_2, hidden_dim_fcn_3)
+    
+    layers = (str(hidden_dim_nn_1) + '-' + str(p1) + '-' + 
+                str(hidden_dim_nn_2) + '-' + str(p2) + '-' + 
+                str(hidden_dim_nn_3)+ '-' + str(p3) + '-' + 
+                str(hidden_dim_fcn_1) + '-' + str(hidden_dim_fcn_2) + '-' + 
+                str(hidden_dim_fcn_3))
 
 
 data = {
@@ -301,7 +321,7 @@ data = {
         "num_edge_features",
         "initial_dim_gcn ",
         "edge_dim_feature",
-        "layers"
+        "layers",
         "training split ",
         "validation split ",
         "batch_size", 
@@ -403,7 +423,7 @@ test_data = {
         "batch_size", 
         "learning_rate",
         "number_of_epochs",
-        "layers"
+        "layers",
         "r2_test",
         "r_test",
         "mae_test",
