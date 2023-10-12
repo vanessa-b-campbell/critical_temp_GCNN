@@ -15,13 +15,18 @@ from scipy.stats import pearsonr
 from src.utils import get_atom_features
 import os
 import csv
+from math import sqrt
+
 
 # FIRST- BEFORE RUNNING!!!!!!
 # 1. delete all processed files in ../chemprop_splits_csv
 # 2. update dates on model folder
 
-model_folder = './model_10_10_loops/'
+model_folder = './model_10_12_II/'
 os.makedirs(model_folder)
+# write something here that will overwrite an existing file with the same name? 
+# maybe make accident prone somehow? 
+
 
 # device information
 device_information = device_info()
@@ -41,12 +46,12 @@ fullset_smiles_list = df[df.columns[0]].values
 # use get_atoms_features from utils.py to get features/edge dictionaries from full_set
 features_dict_fullset, edge_features_dict_fullset = get_atom_features(fullset_smiles_list)
 
-# save dictionaries as csvs
-feat_dict_name = 'features_dict.csv'
-model_f_dict_path = os.path.join(model_folder + feat_dict_name)
 
-edge_dict_name = 'edge_features_dict.csv'
-model_e_dict_path = os.path.join(model_folder + edge_dict_name)
+
+# save features dict as .csv file
+feat_dict_name = 'features_dict.csv'                               #name of features_dict file
+model_f_dict_path = os.path.join(model_folder + feat_dict_name)     #features_dict save path
+
 
 with open(model_f_dict_path, 'w', newline='') as file:
     writer = csv.writer(file)
@@ -56,6 +61,11 @@ with open(model_f_dict_path, 'w', newline='') as file:
         writer.writerow(row)
 file.close()
 
+
+# save egde features dict as .csv file
+edge_dict_name = 'edge_features_dict.csv'                          #name of edge_features_dict file
+model_e_dict_path = os.path.join(model_folder + edge_dict_name)     #edge_features_dict save path
+
 with open(model_e_dict_path, 'w', newline='') as file:
     writer = csv.writer(file)
     header = edge_features_dict_fullset.keys()
@@ -64,8 +74,6 @@ with open(model_e_dict_path, 'w', newline='') as file:
         writer.writerow(row)
 file.close()
 
-#features_dict_fullset = csv.DictWriter(model_f_dict_path, features_dict_fullset.keys())
-#edge_features_dict_fullset = csv.DictWriter(model_e_dict_path, edge_features_dict_fullset.keys())
 
 
 # making full set into a TempDataset object to use as initial_dim_gcn and edge_dim_feature for 
@@ -105,9 +113,6 @@ print('length of testing set: ', len(test_set)) # should be 116
 
 # Build pytorch training and validation set dataloaders:
 
-
-
-
 ## RUN TRAINING LOOP: ---
 
 # Train with a random seed to initialize weights:
@@ -122,8 +127,30 @@ edge_dim_feature = full_set.num_edge_features   #11
 print('Number of NODES features: ', initial_dim_gcn)
 print('Number of EDGES features: ', edge_dim_feature)
 
+hidden_dim_nn_1=2000
+p1 = 0.5 #drop out prob. for each layer
+hidden_dim_nn_2=500
+p2 = 0.4 
+hidden_dim_nn_3=100
+p3 = 0.3 
 
-model =  GCN_Temp(initial_dim_gcn, edge_dim_feature).to(device)
+hidden_dim_fcn_1=1000
+hidden_dim_fcn_2=100
+hidden_dim_fcn_3=5
+
+
+
+
+model =  GCN_Temp(initial_dim_gcn, edge_dim_feature,
+                hidden_dim_nn_1, 
+                p1, 
+                hidden_dim_nn_2, 
+                p2, 
+                hidden_dim_nn_3, 
+                p3,
+                hidden_dim_fcn_1,
+                hidden_dim_fcn_2,
+                hidden_dim_fcn_3).to(device)
 
 model_weights_name = "best_model_weights.pth"
 model_weights_path = os.path.join(model_folder + model_weights_name)
@@ -131,85 +158,69 @@ model_weights_path = os.path.join(model_folder + model_weights_name)
 ########################################################################################################
 
 
+num_of_epochs = 100
+learning_rate = 0.001
+batch_size = 10
+
+# Set up optimizer:
+
+train_dataloader = DataLoader(train_set, batch_size, shuffle=False)
+val_dataloader = DataLoader(val_set, batch_size, shuffle=False)
+
+optimizer = optim.Adam(model.parameters(), learning_rate)
+
+train_losses = []
+val_losses = []
+
+best_val_loss = float('inf')  # infinite
+
+start_time_training = time.time()
+for epoch in range(1, num_of_epochs): #TODO
+
+    train_loss = train(model, device, train_dataloader, optimizer, epoch)
+    train_losses.append(train_loss)
+
+    val_loss = validation(model, device, val_dataloader, epoch)
+    val_losses.append(val_loss)
+    
+    if val_loss < best_val_loss:
+        best_val_loss = val_loss
+        
+        torch.save(model.state_dict(), model_weights_path)
 
 
-best_num_of_epochs = 100
-best_learning_rate = 0
-best_batch_size = 10
-big_r_squared = 0
+finish_time_training = time.time()
+time_training = finish_time_training -start_time_training
 
 
-for batch_size in range(2, 18, 8):
-    for num_of_epochs in range(100, 500, 100):
-        learn_range = (x * 0.0001 for x in range(1, 10, 9))
-        for learning_rate in learn_range:
+#Testing:
+weights_file = model_weights_path
 
 
-            # Set up optimizer:
+#%%
+# Training:
+train_predict_file = 'train_predict.csv' 
+train_predict_file_path_name= os.path.join(model_folder + train_predict_file)
 
-            train_dataloader = DataLoader(train_set, batch_size, shuffle=False)
-            val_dataloader = DataLoader(val_set, batch_size, shuffle=False)
+input_all_train, target_all_train, pred_prob_all_train = predict(model, train_dataloader, device, weights_file, train_predict_file_path_name)
 
-            optimizer = optim.Adam(model.parameters(), learning_rate)
+r2_train = r2_score(target_all_train, pred_prob_all_train)
+mae_train = mean_absolute_error(target_all_train, pred_prob_all_train)
+mse_train = mean_squared_error(target_all_train, pred_prob_all_train, squared=False)
+rmse_train = sqrt(mse_train)
+r_train, _ = pearsonr(target_all_train, pred_prob_all_train)
 
-            train_losses = []
-            val_losses = []
+# Validation:
+val_predict_file = 'val_predict.csv'
+val_predict_file_path_name = os.path.join(model_folder + val_predict_file)
 
-            best_val_loss = float('inf')  # infinite
+input_all_val, target_all_val, pred_prob_all_val = predict(model, val_dataloader, device, weights_file, val_predict_file_path_name )
 
-            start_time_training = time.time()
-            for epoch in range(1, num_of_epochs): #TODO
-
-                train_loss = train(model, device, train_dataloader, optimizer, epoch)
-                train_losses.append(train_loss)
-
-                val_loss = validation(model, device, val_dataloader, epoch)
-                val_losses.append(val_loss)
-                
-                if val_loss < best_val_loss:
-                    best_val_loss = val_loss
-                    
-                    torch.save(model.state_dict(), model_weights_path)
-
-
-            finish_time_training = time.time()
-            time_training = finish_time_training -start_time_training
-
-
-            #Testing:
-            weights_file = model_weights_path
-
-
-            #%%
-            # Training:
-            train_predict_file = 'train_predict.csv' 
-            train_predict_file_path_name= os.path.join(model_folder + train_predict_file)
-
-            input_all_train, target_all_train, pred_prob_all_train = predict(model, train_dataloader, device, weights_file, train_predict_file_path_name)
-
-            r2_train = r2_score(target_all_train, pred_prob_all_train)
-
-            if r2_train > big_r_squared: 
-                big_r_squared = r2_train
-                best_num_of_epochs = num_of_epochs
-                best_learning_rate = learning_rate
-                best_batch_size = batch_size
-
-
-            mae_train = mean_absolute_error(target_all_train, pred_prob_all_train)
-            rmse_train = mean_squared_error(target_all_train, pred_prob_all_train, squared=False)
-            r_train, _ = pearsonr(target_all_train, pred_prob_all_train)
-
-            # Validation:
-            val_predict_file = 'val_predict.csv'
-            val_predict_file_path_name = os.path.join(model_folder + val_predict_file)
-
-            input_all_val, target_all_val, pred_prob_all_val = predict(model, val_dataloader, device, weights_file, val_predict_file_path_name )
-
-            r2_val = r2_score(target_all_val, pred_prob_all_val)
-            mae_val = mean_absolute_error(target_all_val, pred_prob_all_val)
-            rmse_val = mean_squared_error(target_all_val, pred_prob_all_val, squared=False)
-            r_val, _ = pearsonr(target_all_val, pred_prob_all_val)
+r2_val = r2_score(target_all_val, pred_prob_all_val)
+mae_val = mean_absolute_error(target_all_val, pred_prob_all_val)
+mse_val = mean_squared_error(target_all_val, pred_prob_all_val, squared=False)
+rmse_val = sqrt(mse_val)
+r_val, _ = pearsonr(target_all_val, pred_prob_all_val)
 
 
 ######## plots
@@ -278,12 +289,19 @@ print("\n //// Prediction time: {:3f} minutes ////".format(time_prediction))
 print("\n //// Total time: {:3f} minutes ////".format(total_time))
 #results DataFrame
 
+if hidden_dim_nn_1 == 2000 and p1 == 0.5 and hidden_dim_nn_2==500 and p2 == 0.4 and hidden_dim_nn_3==100 and p3 == 0.3 and hidden_dim_fcn_1==1000 and hidden_dim_fcn_2==100 and hidden_dim_fcn_3==5:
+    layers = 'deafult'
+else: 
+    layers = (hidden_dim_nn_1, p1, hidden_dim_nn_2, p2, hidden_dim_nn_3, p3, hidden_dim_fcn_1, hidden_dim_fcn_2, hidden_dim_fcn_3)
+
+
 data = {
     "Metric": [
         "number_features",
         "num_edge_features",
         "initial_dim_gcn ",
         "edge_dim_feature",
+        "layers"
         "training split ",
         "validation split ",
         "batch_size", 
@@ -301,13 +319,14 @@ data = {
         "time_training",
         "time_prediction",
         "total_time",
-        "weights_file"
+        "weights_file",
     ],
     "Value": [
         full_set.num_features,
         full_set.num_edge_features,
         initial_dim_gcn,
         edge_dim_feature ,
+        layers,
         path_train,
         path_val,
         batch_size,
@@ -353,7 +372,8 @@ input_all_test, target_all_test, pred_prob_all_test = predict(model, test_datalo
 
 r2_test = r2_score(target_all_test, pred_prob_all_test)
 mae_test = mean_absolute_error(target_all_test, pred_prob_all_test)
-rmse_test = mean_squared_error(target_all_test, pred_prob_all_test, squared=False)
+mse_test = mean_squared_error(target_all_test, pred_prob_all_test, squared=False)
+rmse_test = sqrt(mse_test)
 r_test, _ = pearsonr(target_all_test, pred_prob_all_test)
 
 #testing stats
@@ -383,6 +403,7 @@ test_data = {
         "batch_size", 
         "learning_rate",
         "number_of_epochs",
+        "layers"
         "r2_test",
         "r_test",
         "mae_test",
@@ -396,6 +417,7 @@ test_data = {
         batch_size,
         learning_rate,
         num_of_epochs,
+        layers,
         r2_test, 
         r_test, 
         mae_test, 
