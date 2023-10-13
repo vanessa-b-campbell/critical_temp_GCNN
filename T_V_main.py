@@ -22,7 +22,7 @@ from math import sqrt
 # 1. delete all processed files in ../chemprop_splits_csv
 # 2. update dates on model folder
 
-model_folder = './model_10_12_delete/'
+model_folder = './model_10_12_III/'
 os.makedirs(model_folder)
 # write something here that will overwrite an existing file with the same name? 
 # maybe make accident prone somehow? 
@@ -127,28 +127,28 @@ edge_dim_feature = full_set.num_edge_features   #11
 print('Number of NODES features: ', initial_dim_gcn)
 print('Number of EDGES features: ', edge_dim_feature)
 
-# hidden_dim_nn_1=500
-# p1 = 0.5 
-# hidden_dim_nn_2=500
-# p2 = 0 
-# hidden_dim_nn_3=100
-# p3 = 0
+hidden_dim_nn_1=500
+p1 = 0.5 
+hidden_dim_nn_2=250
+p2 = 0 
+hidden_dim_nn_3=100
+p3 = 0
 
-# hidden_dim_fcn_1=100
-# hidden_dim_fcn_2=50
-# hidden_dim_fcn_3=5
+hidden_dim_fcn_1=100
+hidden_dim_fcn_2=50
+hidden_dim_fcn_3=5
 
 ## default
-hidden_dim_nn_1=2000
-p1 = 0.5 
-hidden_dim_nn_2=500
-p2 = 0.4
-hidden_dim_nn_3=100
-p3 = 0.3
+# hidden_dim_nn_1=2000
+# p1 = 0.5 
+# hidden_dim_nn_2=500
+# p2 = 0.4
+# hidden_dim_nn_3=100
+# p3 = 0.3
 
-hidden_dim_fcn_1=1000
-hidden_dim_fcn_2=100
-hidden_dim_fcn_3=50
+# hidden_dim_fcn_1=1000
+# hidden_dim_fcn_2=100
+# hidden_dim_fcn_3=50
 
 model =  GCN_Temp(initial_dim_gcn, edge_dim_feature,
                 hidden_dim_nn_1, 
@@ -168,7 +168,7 @@ model_weights_path = os.path.join(model_folder + model_weights_name)
 
 
 num_of_epochs = 100
-learning_rate = 0.0001
+learning_rate = 0.001
 batch_size = 10
 
 # Set up optimizer:
