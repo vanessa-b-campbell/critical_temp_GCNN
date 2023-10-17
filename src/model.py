@@ -35,7 +35,7 @@ class GCN_Temp(torch.nn.Module):
                                 aggr='add')
         self.dropout_3 = nn.Dropout(p=p3)
                 
-        
+        # add ARMA layer 
 
         self.readout = aggr.SumAggregation()
 
