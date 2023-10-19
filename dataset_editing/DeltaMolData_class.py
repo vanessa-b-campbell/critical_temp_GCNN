@@ -164,7 +164,7 @@ def to_fingerprints(path, filename, save_file_path):
 ########### how to use
 data = DeltaMolData("/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/test_full.csv")
 data.get_functioanl_group()
-print(data.inorganic_percent)
-print(data.full_func_stats)
+# print(data.inorganic_percent)
+# print(data.full_func_stats)
 #to_fingerprints("C:\\Users\\color\\Documents\\Bilodeau_Research_Python\\critical-Temp-LNN\\csv_data\\no_outliers_smile_dataset.csv", 'no_outliers_fgprnt_data.csv', 'C:\\Users\\color\\Documents\\Bilodeau_Research_Python\\critical-Temp-LNN\\csv_data')
 
