@@ -21,7 +21,7 @@ from math import sqrt
 # 1. delete all processed files in ../chemprop_splits_csv
 # 2. update dates on model folder
 
-model_folder = './model_10_12_III/'
+model_folder = './model_10_29_II/'
 os.makedirs(model_folder)
 # write something here that will overwrite an existing file with the same name? 
 # maybe make accident prone somehow? 
@@ -126,28 +126,30 @@ edge_dim_feature = full_set.num_edge_features   #11
 print('Number of NODES features: ', initial_dim_gcn)
 print('Number of EDGES features: ', edge_dim_feature)
 
-hidden_dim_nn_1=500
-p1 = 0.5 
-hidden_dim_nn_2=250
-p2 = 0 
-hidden_dim_nn_3=100
-p3 = 0
+# hidden_dim_nn_1=500
+# p1 = 0.5 
+# hidden_dim_nn_2=250
+# p2 = 0 
+# hidden_dim_nn_3=100
+# p3 = 0
 
-hidden_dim_fcn_1=100
-hidden_dim_fcn_2=50
-hidden_dim_fcn_3=5
+# hidden_dim_fcn_1=100
+# hidden_dim_fcn_2=50
+# hidden_dim_fcn_3=5
+# hidden_dim_gat_0 = 45
 
 ## default
-# hidden_dim_nn_1=2000
-# p1 = 0.5 
-# hidden_dim_nn_2=500
-# p2 = 0.4
-# hidden_dim_nn_3=100
-# p3 = 0.3
+hidden_dim_nn_1=2000
+p1 = 0.5 
+hidden_dim_nn_2=500
+p2 = 0.4
+hidden_dim_nn_3=100
+p3 = 0.3
 
-# hidden_dim_fcn_1=1000
-# hidden_dim_fcn_2=100
-# hidden_dim_fcn_3=50
+hidden_dim_fcn_1=1000
+hidden_dim_fcn_2=100
+hidden_dim_fcn_3=50
+hidden_dim_gat_0 = 45
 
 model =  GCN_Temp(initial_dim_gcn, edge_dim_feature,
                 hidden_dim_nn_1, 
@@ -156,6 +158,7 @@ model =  GCN_Temp(initial_dim_gcn, edge_dim_feature,
                 p2, 
                 hidden_dim_nn_3, 
                 p3,
+                hidden_dim_gat_0,
                 hidden_dim_fcn_1,
                 hidden_dim_fcn_2,
                 hidden_dim_fcn_3).to(device)
@@ -215,7 +218,6 @@ input_all_train, target_all_train, pred_prob_all_train = predict(model, train_da
 r2_train = r2_score(target_all_train, pred_prob_all_train)
 mae_train = mean_absolute_error(target_all_train, pred_prob_all_train)
 mse_train = mean_squared_error(target_all_train, pred_prob_all_train, squared=False)
-rmse_train = sqrt(mse_train)
 r_train, _ = pearsonr(target_all_train, pred_prob_all_train)
 
 # Validation:
@@ -227,7 +229,6 @@ input_all_val, target_all_val, pred_prob_all_val = predict(model, val_dataloader
 r2_val = r2_score(target_all_val, pred_prob_all_val)
 mae_val = mean_absolute_error(target_all_val, pred_prob_all_val)
 mse_val = mean_squared_error(target_all_val, pred_prob_all_val, squared=False)
-rmse_val = sqrt(mse_val)
 r_val, _ = pearsonr(target_all_val, pred_prob_all_val)
 
 
@@ -249,7 +250,7 @@ plt.show()
 
 # training stats
 legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".format(
-    r2_train, r_train , mae_train, rmse_train
+    r2_train, r_train , mae_train, mse_train
 )
 
 plt.figure(figsize=(4, 4), dpi=100)
@@ -267,7 +268,7 @@ plt.show()
 
 # Validation stats
 legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".format(
-    r2_val, r_val , mae_val, rmse_val
+    r2_val, r_val , mae_val, mse_val
 )
 
 plt.figure(figsize=(4, 4), dpi=100)
@@ -310,6 +311,7 @@ else:
     layers = (str(hidden_dim_nn_1) + '-' + str(p1) + '-' + 
                 str(hidden_dim_nn_2) + '-' + str(p2) + '-' + 
                 str(hidden_dim_nn_3)+ '-' + str(p3) + '-' + 
+                str(hidden_dim_gat_0) + '-' +
                 str(hidden_dim_fcn_1) + '-' + str(hidden_dim_fcn_2) + '-' + 
                 str(hidden_dim_fcn_3))
 
@@ -329,11 +331,11 @@ data = {
         "r2_train",
         "r_train",
         "mae_train",
-        "rmse_train", 
+        "mse_train", 
         "r2_validation",
         "r_validation",
         "mae_validation",
-        "rmse_validation",
+        "mse_validation",
         "time_preprocessing", 
         "time_training",
         "time_prediction",
@@ -354,11 +356,11 @@ data = {
         r2_train, 
         r_train, 
         mae_train, 
-        rmse_train,
+        mse_train,
         r2_val,
         r_val,
         mae_val, 
-        rmse_val,
+        mse_val,
         time_preprocessing, 
         time_training,
         time_prediction,
@@ -392,12 +394,11 @@ input_all_test, target_all_test, pred_prob_all_test = predict(model, test_datalo
 r2_test = r2_score(target_all_test, pred_prob_all_test)
 mae_test = mean_absolute_error(target_all_test, pred_prob_all_test)
 mse_test = mean_squared_error(target_all_test, pred_prob_all_test, squared=False)
-rmse_test = sqrt(mse_test)
 r_test, _ = pearsonr(target_all_test, pred_prob_all_test)
 
 #testing stats
 legend_text = "R2 Score: {:.4f}\nR Pearson: {:.4f}\nMAE: {:.4f}\nRMSE: {:.4f}".format(
-    r2_test, r_test , mae_test, rmse_test
+    r2_test, r_test , mae_test, mse_test
 )
 
 plt.figure(figsize=(4, 4), dpi=100)
@@ -426,7 +427,7 @@ test_data = {
         "r2_test",
         "r_test",
         "mae_test",
-        "rmse_test", 
+        "mse_test", 
         "weights_file"
     ],
     "Value": [
@@ -440,7 +441,7 @@ test_data = {
         r2_test, 
         r_test, 
         mae_test, 
-        rmse_test,
+        mse_test,
         weights_file
     ],
     
