@@ -12,7 +12,7 @@ class GCN_Temp(torch.nn.Module):
                 p2 = 0.4 ,
                 hidden_dim_nn_3=100,
                 p3 = 0.3 ,
-                hidden_dim_gat_0 = 45,
+                # hidden_dim_gat_0 = 45,
                 
                 hidden_dim_fcn_1=1000,
                 hidden_dim_fcn_2=100,
@@ -37,7 +37,7 @@ class GCN_Temp(torch.nn.Module):
                 
         # add ARMA layer 
         # the value added corresponds to the number of edge features: I have 11
-        self.nn_gat_1 = ARMAConv(hidden_dim_nn_3+11, hidden_dim_gat_0, num_stacks = 3, dropout=0, num_layers=11, shared_weights = False ) #TODO
+        # self.nn_gat_1 = ARMAConv(hidden_dim_nn_3+11, hidden_dim_gat_0, num_stacks = 3, dropout=0, num_layers=11, shared_weights = False ) #TODO
 
         self.readout = aggr.SumAggregation()
 

@@ -21,10 +21,8 @@ from math import sqrt
 # 1. delete all processed files in ../chemprop_splits_csv
 # 2. update dates on model folder
 
-model_folder = './model_10_29_II/'
+model_folder = './model_10_29_V/'
 os.makedirs(model_folder)
-# write something here that will overwrite an existing file with the same name? 
-# maybe make accident prone somehow? 
 
 
 # device information
@@ -79,8 +77,6 @@ file.close()
 # model parameters
 full_set = TempDataset(root, path, features_dict_fullset, edge_features_dict_fullset)
 
-finish_time_preprocessing = time.time()
-time_preprocessing = (finish_time_preprocessing - finish_time_preprocessing) / 60
 
 
 ## SET UP DATALOADERS: ---
@@ -109,6 +105,17 @@ test_set = TempDataset(root_test, path_test, features_dict_fullset, edge_feature
 
 print('length of testing set: ', len(test_set)) # should be 116
 
+# using full set to get number of features/ number of edge festures
+initial_dim_gcn = full_set.num_features         #45
+edge_dim_feature = full_set.num_edge_features   #11
+
+print('Number of NODES features: ', initial_dim_gcn)
+print('Number of EDGES features: ', edge_dim_feature)
+
+
+
+finish_time_preprocessing = time.time()
+time_preprocessing = (finish_time_preprocessing - start_time) / 60
 
 # Build pytorch training and validation set dataloaders:
 
@@ -119,12 +126,6 @@ torch.manual_seed(0)
 
 ## SET UP MODEL
 
-# using full set to get number of features/ number of edge festures
-initial_dim_gcn = full_set.num_features         #45
-edge_dim_feature = full_set.num_edge_features   #11
-
-print('Number of NODES features: ', initial_dim_gcn)
-print('Number of EDGES features: ', edge_dim_feature)
 
 # hidden_dim_nn_1=500
 # p1 = 0.5 
@@ -149,7 +150,7 @@ p3 = 0.3
 hidden_dim_fcn_1=1000
 hidden_dim_fcn_2=100
 hidden_dim_fcn_3=50
-hidden_dim_gat_0 = 45
+# hidden_dim_gat_0 = 45
 
 model =  GCN_Temp(initial_dim_gcn, edge_dim_feature,
                 hidden_dim_nn_1, 
@@ -158,7 +159,7 @@ model =  GCN_Temp(initial_dim_gcn, edge_dim_feature,
                 p2, 
                 hidden_dim_nn_3, 
                 p3,
-                hidden_dim_gat_0,
+                # hidden_dim_gat_0,
                 hidden_dim_fcn_1,
                 hidden_dim_fcn_2,
                 hidden_dim_fcn_3).to(device)
@@ -305,13 +306,19 @@ if (hidden_dim_nn_1 == 2000 and p1 == 0.5 and
     hidden_dim_fcn_1==1000 and hidden_dim_fcn_2==100 and 
     hidden_dim_fcn_3==50):
     
-    layers = 'default'
+    layers = ('default: ' + str(hidden_dim_nn_1) + '-' + str(p1) + '-' + 
+                str(hidden_dim_nn_2) + '-' + str(p2) + '-' + 
+                str(hidden_dim_nn_3)+ '-' + str(p3) + '-' + 
+                # str(hidden_dim_gat_0) + '-' +
+                str(hidden_dim_fcn_1) + '-' + str(hidden_dim_fcn_2) + '-' + 
+                str(hidden_dim_fcn_3))
+
 else: 
     
     layers = (str(hidden_dim_nn_1) + '-' + str(p1) + '-' + 
                 str(hidden_dim_nn_2) + '-' + str(p2) + '-' + 
                 str(hidden_dim_nn_3)+ '-' + str(p3) + '-' + 
-                str(hidden_dim_gat_0) + '-' +
+                # str(hidden_dim_gat_0) + '-' +
                 str(hidden_dim_fcn_1) + '-' + str(hidden_dim_fcn_2) + '-' + 
                 str(hidden_dim_fcn_3))
 
@@ -332,12 +339,12 @@ data = {
         "r_train",
         "mae_train",
         "mse_train", 
+        "time_training",
         "r2_validation",
         "r_validation",
         "mae_validation",
         "mse_validation",
-        "time_preprocessing", 
-        "time_training",
+        'time_preprocessing',
         "time_prediction",
         "total_time",
         "weights_file",
@@ -357,12 +364,12 @@ data = {
         r_train, 
         mae_train, 
         mse_train,
+        time_training,
         r2_val,
         r_val,
         mae_val, 
         mse_val,
-        time_preprocessing, 
-        time_training,
+        time_preprocessing,
         time_prediction,
         total_time,
         weights_file
