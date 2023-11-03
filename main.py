@@ -21,7 +21,7 @@ from math import sqrt
 # 1. delete all processed files in ../chemprop_splits_csv
 # 2. update dates on model folder
 
-model_folder = './model_10_29_V/'
+model_folder = './model_11_03_IV/'
 os.makedirs(model_folder)
 
 
@@ -128,7 +128,7 @@ torch.manual_seed(0)
 
 
 # hidden_dim_nn_1=500
-# p1 = 0.5 
+# p1 = 0 
 # hidden_dim_nn_2=250
 # p2 = 0 
 # hidden_dim_nn_3=100
@@ -137,20 +137,24 @@ torch.manual_seed(0)
 # hidden_dim_fcn_1=100
 # hidden_dim_fcn_2=50
 # hidden_dim_fcn_3=5
-# hidden_dim_gat_0 = 45
+# hidden_dim_gat_0 = 15
 
 ## default
 hidden_dim_nn_1=2000
-p1 = 0.5 
+p1 = 0 
 hidden_dim_nn_2=500
-p2 = 0.4
+p2 = 0
 hidden_dim_nn_3=100
-p3 = 0.3
+p3 = 0
+# if with drop out number of layers needs to be larger 
+# try no drop out with smaller layers
 
 hidden_dim_fcn_1=1000
 hidden_dim_fcn_2=100
 hidden_dim_fcn_3=50
-# hidden_dim_gat_0 = 45
+#ARMA layer
+hidden_dim_gat_0 = 15
+# change number- 
 
 model =  GCN_Temp(initial_dim_gcn, edge_dim_feature,
                 hidden_dim_nn_1, 
@@ -159,7 +163,7 @@ model =  GCN_Temp(initial_dim_gcn, edge_dim_feature,
                 p2, 
                 hidden_dim_nn_3, 
                 p3,
-                # hidden_dim_gat_0,
+                hidden_dim_gat_0,
                 hidden_dim_fcn_1,
                 hidden_dim_fcn_2,
                 hidden_dim_fcn_3).to(device)
@@ -304,21 +308,32 @@ if (hidden_dim_nn_1 == 2000 and p1 == 0.5 and
     hidden_dim_nn_2==500 and p2 == 0.4 and 
     hidden_dim_nn_3==100 and p3 == 0.3 and 
     hidden_dim_fcn_1==1000 and hidden_dim_fcn_2==100 and 
-    hidden_dim_fcn_3==50):
+    hidden_dim_fcn_3==50 and hidden_dim_gat_0== 45):
     
+    layers = ('default_ARMA: ' + str(hidden_dim_nn_1) + '-' + str(p1) + '-' + 
+                str(hidden_dim_nn_2) + '-' + str(p2) + '-' + 
+                str(hidden_dim_nn_3)+ '-' + str(p3) + '-' + 
+                str(hidden_dim_gat_0) + '-' +
+                str(hidden_dim_fcn_1) + '-' + str(hidden_dim_fcn_2) + '-' + 
+                str(hidden_dim_fcn_3))
+    
+elif (hidden_dim_nn_1 == 2000 and p1 == 0.5 and 
+    hidden_dim_nn_2==500 and p2 == 0.4 and 
+    hidden_dim_nn_3==100 and p3 == 0.3 and 
+    hidden_dim_fcn_1==1000 and hidden_dim_fcn_2==100 and 
+    hidden_dim_fcn_3==50):
+
     layers = ('default: ' + str(hidden_dim_nn_1) + '-' + str(p1) + '-' + 
                 str(hidden_dim_nn_2) + '-' + str(p2) + '-' + 
                 str(hidden_dim_nn_3)+ '-' + str(p3) + '-' + 
-                # str(hidden_dim_gat_0) + '-' +
                 str(hidden_dim_fcn_1) + '-' + str(hidden_dim_fcn_2) + '-' + 
                 str(hidden_dim_fcn_3))
 
 else: 
-    
     layers = (str(hidden_dim_nn_1) + '-' + str(p1) + '-' + 
                 str(hidden_dim_nn_2) + '-' + str(p2) + '-' + 
                 str(hidden_dim_nn_3)+ '-' + str(p3) + '-' + 
-                # str(hidden_dim_gat_0) + '-' +
+                str(hidden_dim_gat_0) + '-' +
                 str(hidden_dim_fcn_1) + '-' + str(hidden_dim_fcn_2) + '-' + 
                 str(hidden_dim_fcn_3))
 
@@ -344,7 +359,7 @@ data = {
         "r_validation",
         "mae_validation",
         "mse_validation",
-        'time_preprocessing',
+        'time_processing(min)',
         "time_prediction",
         "total_time",
         "weights_file",
