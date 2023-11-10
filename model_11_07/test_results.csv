@@ -1,0 +1,13 @@
+Metric,Value
+initial_dim_gcn ,45
+edge_dim_feature,11
+testing split ,/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/test_full.csv
+batch_size,10
+learning_rate,0.001
+number_of_epochs,60
+layers,60-0-20-0-15-0-15-10-5
+r2_test,0.24759414299228077
+r_test,0.6921753368987047
+mae_test,58.54993433343295
+mse_test,107.14426844594229
+weights_file,./model_11_07/best_model_weights.pth

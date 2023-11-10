@@ -6,7 +6,11 @@ import torch.optim as optim
 from torch_geometric.loader import DataLoader
 from src.device import device_info
 from src.data import TempDataset
-from src.model import GCN_Temp 
+
+from src.model import GCN_Temp          #no ARMA layers
+#from src.one_AMRAmodel import GCN_Temp #one ARMA layer
+#from src.ARMAmodel import GCN_Temp     #all ARMA layers
+
 import pandas as pd
 from src.process import train, validation, predict
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
@@ -18,10 +22,10 @@ from math import sqrt
 
 
 # FIRST- BEFORE RUNNING!!!!!!
-# 1. delete all processed files in ../chemprop_splits_csv
-# 2. update dates on model folder
+# 1. update dates on model folder name
+# 2. update model layer line 161 either for ARMA or without ARMA
 
-model_folder = './model_11_03_IV/'
+model_folder = './model_11_09_II/'
 os.makedirs(model_folder)
 
 
@@ -100,7 +104,7 @@ print('length of validation set: ', len(val_set))
 
 ## SET UP testing DATALOADERS: ---
 root_test = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing'
-path_test = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/test_full.csv'
+path_test = '/home/jbd3qn/Downloads/critical_temp_GCNN/chemprop_splits_csv/Testing/C_test_full.csv'
 test_set = TempDataset(root_test, path_test, features_dict_fullset, edge_features_dict_fullset)
 
 print('length of testing set: ', len(test_set)) # should be 116
@@ -126,7 +130,6 @@ torch.manual_seed(0)
 
 ## SET UP MODEL
 
-
 # hidden_dim_nn_1=500
 # p1 = 0 
 # hidden_dim_nn_2=250
@@ -141,21 +144,22 @@ torch.manual_seed(0)
 
 ## default
 hidden_dim_nn_1=2000
-p1 = 0 
+p1 = 0.5
 hidden_dim_nn_2=500
-p2 = 0
+p2 = 0.4
 hidden_dim_nn_3=100
-p3 = 0
-# if with drop out number of layers needs to be larger 
-# try no drop out with smaller layers
+p3 = 0.3
 
 hidden_dim_fcn_1=1000
 hidden_dim_fcn_2=100
 hidden_dim_fcn_3=50
-#ARMA layer
-hidden_dim_gat_0 = 15
+
+# #ARMA layer
+# hidden_dim_gat_0 = 15
 # change number- 
 
+
+# with drop out number of layers needs to be larger 
 model =  GCN_Temp(initial_dim_gcn, edge_dim_feature,
                 hidden_dim_nn_1, 
                 p1, 
@@ -163,7 +167,7 @@ model =  GCN_Temp(initial_dim_gcn, edge_dim_feature,
                 p2, 
                 hidden_dim_nn_3, 
                 p3,
-                hidden_dim_gat_0,
+                # hidden_dim_gat_0,
                 hidden_dim_fcn_1,
                 hidden_dim_fcn_2,
                 hidden_dim_fcn_3).to(device)
@@ -308,32 +312,28 @@ if (hidden_dim_nn_1 == 2000 and p1 == 0.5 and
     hidden_dim_nn_2==500 and p2 == 0.4 and 
     hidden_dim_nn_3==100 and p3 == 0.3 and 
     hidden_dim_fcn_1==1000 and hidden_dim_fcn_2==100 and 
-    hidden_dim_fcn_3==50 and hidden_dim_gat_0== 45):
+    hidden_dim_fcn_3==50): #and hidden_dim_gat_0>=0):
     
-    layers = ('default_ARMA: ' + str(hidden_dim_nn_1) + '-' + str(p1) + '-' + 
-                str(hidden_dim_nn_2) + '-' + str(p2) + '-' + 
-                str(hidden_dim_nn_3)+ '-' + str(p3) + '-' + 
-                str(hidden_dim_gat_0) + '-' +
-                str(hidden_dim_fcn_1) + '-' + str(hidden_dim_fcn_2) + '-' + 
-                str(hidden_dim_fcn_3))
-    
-elif (hidden_dim_nn_1 == 2000 and p1 == 0.5 and 
-    hidden_dim_nn_2==500 and p2 == 0.4 and 
-    hidden_dim_nn_3==100 and p3 == 0.3 and 
-    hidden_dim_fcn_1==1000 and hidden_dim_fcn_2==100 and 
-    hidden_dim_fcn_3==50):
-
     layers = ('default: ' + str(hidden_dim_nn_1) + '-' + str(p1) + '-' + 
                 str(hidden_dim_nn_2) + '-' + str(p2) + '-' + 
                 str(hidden_dim_nn_3)+ '-' + str(p3) + '-' + 
+                # str(hidden_dim_gat_0) + '-' +
                 str(hidden_dim_fcn_1) + '-' + str(hidden_dim_fcn_2) + '-' + 
                 str(hidden_dim_fcn_3))
+    
+# elif (hidden_dim_gat_0>=0):
+
+#     layers = ('w/ARMA:' + str(hidden_dim_nn_1) + '-' + str(p1) + '-' + 
+#                 str(hidden_dim_nn_2) + '-' + str(p2) + '-' + 
+#                 str(hidden_dim_nn_3)+ '-' + str(p3) + '-' + 
+#                 str(hidden_dim_fcn_1) + '-' + str(hidden_dim_fcn_2) + '-' + 
+#                 str(hidden_dim_fcn_3))
 
 else: 
     layers = (str(hidden_dim_nn_1) + '-' + str(p1) + '-' + 
                 str(hidden_dim_nn_2) + '-' + str(p2) + '-' + 
                 str(hidden_dim_nn_3)+ '-' + str(p3) + '-' + 
-                str(hidden_dim_gat_0) + '-' +
+                # str(hidden_dim_gat_0) + '-' +
                 str(hidden_dim_fcn_1) + '-' + str(hidden_dim_fcn_2) + '-' + 
                 str(hidden_dim_fcn_3))
 

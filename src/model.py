@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric.nn import NNConv, ARMAConv
+from torch_geometric.nn import NNConv
 from torch_geometric.nn import aggr
 
 class GCN_Temp(torch.nn.Module):
@@ -12,8 +12,6 @@ class GCN_Temp(torch.nn.Module):
                 p2 = 0.4 ,
                 hidden_dim_nn_3=100,
                 p3 = 0.3 ,
-                #ARMA
-                hidden_dim_gat_0 = 45,
                 
                 hidden_dim_fcn_1=1000,
                 hidden_dim_fcn_2=100,
@@ -36,15 +34,11 @@ class GCN_Temp(torch.nn.Module):
                                 aggr='add')
         self.dropout_3 = nn.Dropout(p=p3)
                 
-        # add ARMA layer 
-        # the value added corresponds to the number of edge features: I have 11
-        self.nn_gat_1 = ARMAConv(hidden_dim_nn_3, hidden_dim_gat_0, num_stacks = 3, dropout=0, num_layers=7, shared_weights = False ) #TODO
-# see if changing the number of stacks does anything
-# num of layers should be greater than the number of stacks
+        
         self.readout = aggr.SumAggregation()
 
-                                #ARMA layer: 'hidden_dim_gat_0+11' ----- w/out ARMA: 'hidden_dim_nn_3
-        self.linear1 = nn.Linear(hidden_dim_gat_0, hidden_dim_fcn_1)
+                                
+        self.linear1 = nn.Linear(hidden_dim_nn_3, hidden_dim_fcn_1)
         self.linear2 = nn.Linear(hidden_dim_fcn_1, hidden_dim_fcn_2)
         self.linear3 = nn.Linear(hidden_dim_fcn_2, hidden_dim_fcn_3)
         self.linear4 = nn.Linear(hidden_dim_fcn_3, 1)
@@ -67,9 +61,6 @@ class GCN_Temp(torch.nn.Module):
         x = F.relu(x)
         x = self.dropout_3(x)
         
-        #ARMA
-        x = self.nn_gat_1(x, edge_index)
-        x = F.relu(x)
         
         x = self.readout(x, data.batch)
     # after read out, size is number of molecules in batch 
