@@ -25,7 +25,7 @@ from math import sqrt
 # 1. update dates on model folder name
 # 2. update model layer line 161 either for ARMA or without ARMA
 
-model_folder = './model_11_09_II/'
+model_folder = './model_11_09_VI/'
 os.makedirs(model_folder)
 
 
